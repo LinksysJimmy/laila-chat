@@ -71,7 +71,7 @@ v2 更新引入了一項重大變更，將 Aurora Serverless 上的 pgvector 和
 
 ![](../imgs/v1_to_v2_KB_s3_source.png)
 
-**請注意，某些功能在 Knowledge Bases 上不可用，例如網頁爬蟲和 YouTube 字幕支援（計劃支援網頁爬蟲（[issue](https://github.com/aws-samples/bedrock-chat/issues/557)））。** 另外，請記住，在過渡期間使用 Knowledge Bases 將同時產生 Aurora 和 Knowledge Bases 的費用。
+**請注意，某些功能在 Knowledge Bases 上不可用，例如網頁爬蟲和 YouTube 字幕支援（計劃支援網頁爬蟲（[issue](https://github.com/LinksysJimmy/laila-chat/issues/557)））。** 另外，請記住，在過渡期間使用 Knowledge Bases 將同時產生 Aurora 和 Knowledge Bases 的費用。
 
 4. **移除已發布的 API**：由於 VPC 刪除，所有先前發布的 API 都需要在部署 v2 之前重新發布。為此，您需要先刪除現有的 API。使用[管理員的 API 管理功能](../ADMINISTRATOR_zh-TW.md)可以簡化此過程。一旦所有 `APIPublishmentStackXXXX` CloudFormation 堆疊刪除完成，環境就準備就緒了。
 

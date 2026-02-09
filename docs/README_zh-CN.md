@@ -4,12 +4,12 @@
   <img src="https://img.shields.io/github/v/release/aws-samples/bedrock-chat?style=flat-square" />
   <img src="https://img.shields.io/github/license/aws-samples/bedrock-chat?style=flat-square" />
   <img src="https://img.shields.io/github/actions/workflow/status/aws-samples/bedrock-chat/cdk.yml?style=flat-square" />
-  <a href="https://github.com/aws-samples/bedrock-chat/issues?q=is%3Aissue%20state%3Aopen%20label%3Aroadmap">
+  <a href="https://github.com/LinksysJimmy/laila-chat/issues?q=is%3Aissue%20state%3Aopen%20label%3Aroadmap">
     <img src="https://img.shields.io/badge/roadmap-view-blue?style=flat-square" />
   </a>
 </p>
 
-[English](https://github.com/aws-samples/bedrock-chat/blob/v3/README.md) | [日本語](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_ja-JP.md) | [한국어](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_ko-KR.md) | [中文](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_zh-CN.md) | [Français](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_fr-FR.md) | [Deutsch](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_de-DE.md) | [Español](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_es-ES.md) | [Italian](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_it-IT.md) | [Norsk](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_nb-NO.md) | [ไทย](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_th-TH.md) | [Bahasa Indonesia](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_id-ID.md) | [Bahasa Melayu](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_ms-MY.md) | [Tiếng Việt](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_vi-VN.md) | [Polski](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_pl-PL.md) | [Português Brasil](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_pt-BR.md)
+[English](https://github.com/LinksysJimmy/laila-chat/blob/v3/README.md) | [日本語](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_ja-JP.md) | [한국어](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_ko-KR.md) | [中文](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_zh-CN.md) | [Français](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_fr-FR.md) | [Deutsch](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_de-DE.md) | [Español](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_es-ES.md) | [Italian](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_it-IT.md) | [Norsk](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_nb-NO.md) | [ไทย](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_th-TH.md) | [Bahasa Indonesia](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_id-ID.md) | [Bahasa Melayu](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_ms-MY.md) | [Tiếng Việt](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_vi-VN.md) | [Polski](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_pl-PL.md) | [Português Brasil](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_pt-BR.md)
 
 
 一个由[Amazon Bedrock](https://aws.amazon.com/bedrock/)驱动的多语言生成式AI平台。
@@ -89,7 +89,7 @@ API管理、将机器人标记为必需、分析机器人使用情况。[详情]
 - 通过以下命令运行部署。如果你想指定要部署的版本或需要应用安全策略,请从[可选参数](#optional-parameters)中指定适当的参数。
 
 ```sh
-git clone https://github.com/aws-samples/bedrock-chat.git
+git clone https://github.com/LinksysJimmy/laila-chat.git
 cd bedrock-chat
 chmod +x bin.sh
 ./bin.sh
@@ -108,7 +108,7 @@ chmod +x bin.sh
 - **--disable-ipv6**: 禁用 IPv6 连接。(默认:启用)
 - **--allowed-signup-email-domains**: 允许注册的电子邮件域名列表,用逗号分隔。(默认:无域名限制)
 - **--bedrock-region**: 定义 bedrock 可用的区域。(默认:us-east-1)
-- **--repo-url**: 要部署的 Bedrock Chat 的自定义仓库,如果是 fork 或自定义源代码控制。(默认:https://github.com/aws-samples/bedrock-chat.git)
+- **--repo-url**: 要部署的 Bedrock Chat 的自定义仓库,如果是 fork 或自定义源代码控制。(默认:https://github.com/LinksysJimmy/laila-chat.git)
 - **--version**: 要部署的 Bedrock Chat 版本。(默认:开发中的最新版本)
 - **--cdk-json-override**: 你可以在部署期间使用覆盖 JSON 块覆盖任何 CDK 上下文值。这允许你在不直接编辑 cdk.json 文件的情况下修改配置。
 
@@ -203,7 +203,7 @@ Frontend URL: https://xxxxxxxxx.cloudfront.net
 - 克隆此存储库
 
 ```
-git clone https://github.com/aws-samples/bedrock-chat
+git clone https://github.com/LinksysJimmy/laila-chat
 ```
 
 - 安装 npm 包
@@ -669,7 +669,7 @@ bedrockChatParams.set("default", {
 
 ## 贡献者
 
-[![bedrock chat contributors](https://contrib.rocks/image?repo=aws-samples/bedrock-chat&max=1000)](https://github.com/aws-samples/bedrock-chat/graphs/contributors)
+[![bedrock chat contributors](https://contrib.rocks/image?repo=aws-samples/bedrock-chat&max=1000)](https://github.com/LinksysJimmy/laila-chat/graphs/contributors)
 
 ## 许可证
 

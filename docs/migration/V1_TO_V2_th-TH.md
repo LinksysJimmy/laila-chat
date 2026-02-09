@@ -71,7 +71,7 @@
 
 ![](../imgs/v1_to_v2_KB_s3_source.png)
 
-**โปรดทราบว่าบางฟีเจอร์ไม่สามารถใช้งานได้บน Knowledge Bases เช่น การครอบเว็บและการรองรับการถอดข้อความ YouTube (วางแผนที่จะรองรับตัวครอบเว็บ ([issue](https://github.com/aws-samples/bedrock-chat/issues/557)))** นอกจากนี้ โปรดทราบว่าการใช้ Knowledge Bases จะมีค่าใช้จ่ายทั้งสำหรับ Aurora และ Knowledge Bases ในระหว่างการเปลี่ยนผ่าน
+**โปรดทราบว่าบางฟีเจอร์ไม่สามารถใช้งานได้บน Knowledge Bases เช่น การครอบเว็บและการรองรับการถอดข้อความ YouTube (วางแผนที่จะรองรับตัวครอบเว็บ ([issue](https://github.com/LinksysJimmy/laila-chat/issues/557)))** นอกจากนี้ โปรดทราบว่าการใช้ Knowledge Bases จะมีค่าใช้จ่ายทั้งสำหรับ Aurora และ Knowledge Bases ในระหว่างการเปลี่ยนผ่าน
 
 4. **ลบ API ที่เผยแพร่**: API ที่เคยเผยแพร่ทั้งหมดจะต้องเผยแพร่ใหม่ก่อนที่จะ deploy v2 เนื่องจากการลบ VPC ในการทำเช่นนี้ คุณจะต้องลบ API ที่มีอยู่ก่อน การใช้[ฟีเจอร์การจัดการ API ของผู้ดูแลระบบ](../ADMINISTRATOR_th-TH.md)สามารถทำให้กระบวนการนี้ง่ายขึ้น เมื่อการลบ CloudFormation stacks `APIPublishmentStackXXXX` ทั้งหมดเสร็จสิ้น สภาพแวดล้อมจะพร้อมใช้งาน
 

@@ -71,7 +71,7 @@ Langkah-langkah berbeza bergantung sama ada anda menggunakan v1.2 atau sebelumny
 
 ![](../imgs/v1_to_v2_KB_s3_source.png)
 
-**Perhatikan bahawa beberapa ciri tidak tersedia pada Knowledge Bases, seperti sokongan perayapan web dan transkrip YouTube (Merancang untuk menyokong perayap web ([isu](https://github.com/aws-samples/bedrock-chat/issues/557))).** Juga, ingat bahawa penggunaan Knowledge Bases akan mengenakan caj untuk kedua-dua Aurora dan Knowledge Bases semasa peralihan.
+**Perhatikan bahawa beberapa ciri tidak tersedia pada Knowledge Bases, seperti sokongan perayapan web dan transkrip YouTube (Merancang untuk menyokong perayap web ([isu](https://github.com/LinksysJimmy/laila-chat/issues/557))).** Juga, ingat bahawa penggunaan Knowledge Bases akan mengenakan caj untuk kedua-dua Aurora dan Knowledge Bases semasa peralihan.
 
 4. **Buang API yang diterbitkan**: Semua API yang telah diterbitkan sebelumnya perlu diterbitkan semula sebelum menggunakan v2 kerana penghapusan VPC. Untuk melakukan ini, anda perlu memadamkan API sedia ada terlebih dahulu. Menggunakan [ciri Pengurusan API pentadbir](../ADMINISTRATOR_ms-MY.md) boleh memudahkan proses ini. Setelah penghapusan semua tindanan CloudFormation `APIPublishmentStackXXXX` selesai, persekitaran akan sedia.
 

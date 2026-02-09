@@ -71,7 +71,7 @@ Trinnene varierer avhengig av om du bruker v1.2 eller tidligere, eller v1.3.
 
 ![](../imgs/v1_to_v2_KB_s3_source.png)
 
-**Merk at noen funksjoner ikke er tilgjengelige på Knowledge Bases, som nettkryping og YouTube-transkriptstøtte (Planlegger å støtte nettkryper ([issue](https://github.com/aws-samples/bedrock-chat/issues/557))).** Husk også at bruk av Knowledge Bases vil medføre kostnader for både Aurora og Knowledge Bases under overgangen.
+**Merk at noen funksjoner ikke er tilgjengelige på Knowledge Bases, som nettkryping og YouTube-transkriptstøtte (Planlegger å støtte nettkryper ([issue](https://github.com/LinksysJimmy/laila-chat/issues/557))).** Husk også at bruk av Knowledge Bases vil medføre kostnader for både Aurora og Knowledge Bases under overgangen.
 
 4. **Fjern publiserte API-er**: Alle tidligere publiserte API-er må republiseres før v2 deployes på grunn av VPC-sletting. For å gjøre dette må du først slette de eksisterende API-ene. Bruk av [administrators API Management-funksjon](../ADMINISTRATOR_nb-NO.md) kan forenkle denne prosessen. Når slettingen av alle `APIPublishmentStackXXXX` CloudFormation-stacks er fullført, vil miljøet være klart.
 

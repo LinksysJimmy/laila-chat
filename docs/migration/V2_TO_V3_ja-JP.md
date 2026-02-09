@@ -52,7 +52,7 @@ V3では、**パブリック共有が有効になっているすべてのV2ボ�
 git remote -v
 
 # リモートURLを更新
-git remote set-url origin https://github.com/aws-samples/bedrock-chat.git
+git remote set-url origin https://github.com/LinksysJimmy/laila-chat.git
 
 # 変更を確認
 git remote -v

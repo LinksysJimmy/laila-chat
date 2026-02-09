@@ -6,7 +6,7 @@ const translation = {
       },
     },
     app: {
-      name: 'Bedrock Chat',
+      name: 'LAILA Chat',
       inputMessage: 'Bisakah Saya Membantu Anda?',
       pinnedBots: 'Bot yang Dipin',
       starredBots: 'Bot Favorit',

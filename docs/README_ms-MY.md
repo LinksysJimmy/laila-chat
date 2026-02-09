@@ -4,12 +4,12 @@
   <img src="https://img.shields.io/github/v/release/aws-samples/bedrock-chat?style=flat-square" />
   <img src="https://img.shields.io/github/license/aws-samples/bedrock-chat?style=flat-square" />
   <img src="https://img.shields.io/github/actions/workflow/status/aws-samples/bedrock-chat/cdk.yml?style=flat-square" />
-  <a href="https://github.com/aws-samples/bedrock-chat/issues?q=is%3Aissue%20state%3Aopen%20label%3Aroadmap">
+  <a href="https://github.com/LinksysJimmy/laila-chat/issues?q=is%3Aissue%20state%3Aopen%20label%3Aroadmap">
     <img src="https://img.shields.io/badge/roadmap-view-blue?style=flat-square" />
   </a>
 </p>
 
-[English](https://github.com/aws-samples/bedrock-chat/blob/v3/README.md) | [日本語](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_ja-JP.md) | [한국어](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_ko-KR.md) | [中文](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_zh-CN.md) | [Français](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_fr-FR.md) | [Deutsch](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_de-DE.md) | [Español](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_es-ES.md) | [Italian](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_it-IT.md) | [Norsk](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_nb-NO.md) | [ไทย](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_th-TH.md) | [Bahasa Indonesia](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_id-ID.md) | [Bahasa Melayu](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_ms-MY.md) | [Tiếng Việt](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_vi-VN.md) | [Polski](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_pl-PL.md) | [Português Brasil](https://github.com/aws-samples/bedrock-chat/blob/v3/docs/README_pt-BR.md)
+[English](https://github.com/LinksysJimmy/laila-chat/blob/v3/README.md) | [日本語](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_ja-JP.md) | [한국어](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_ko-KR.md) | [中文](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_zh-CN.md) | [Français](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_fr-FR.md) | [Deutsch](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_de-DE.md) | [Español](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_es-ES.md) | [Italian](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_it-IT.md) | [Norsk](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_nb-NO.md) | [ไทย](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_th-TH.md) | [Bahasa Indonesia](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_id-ID.md) | [Bahasa Melayu](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_ms-MY.md) | [Tiếng Việt](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_vi-VN.md) | [Polski](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_pl-PL.md) | [Português Brasil](https://github.com/LinksysJimmy/laila-chat/blob/v3/docs/README_pt-BR.md)
 
 
 Platform AI generatif berbilang bahasa yang dikuasakan oleh [Amazon Bedrock](https://aws.amazon.com/bedrock/).
@@ -89,7 +89,7 @@ Untuk parameter **bedrock-region** anda perlu memilih rantau [di mana Bedrock te
 - Jalankan penempatan melalui arahan berikut. Jika anda ingin menentukan versi untuk ditempatkan atau perlu menggunakan dasar keselamatan, sila tentukan parameter yang sesuai dari [Parameter Pilihan](#optional-parameters).
 
 ```sh
-git clone https://github.com/aws-samples/bedrock-chat.git
+git clone https://github.com/LinksysJimmy/laila-chat.git
 cd bedrock-chat
 chmod +x bin.sh
 ./bin.sh
@@ -108,7 +108,7 @@ Anda boleh menentukan parameter berikut semasa penempatan untuk meningkatkan kes
 - **--disable-ipv6**: Nyahaktifkan sambungan melalui IPv6. (lalai: diaktifkan)
 - **--allowed-signup-email-domains**: Senarai domain e-mel yang dibenarkan untuk pendaftaran, dipisahkan dengan koma. (lalai: tiada sekatan domain)
 - **--bedrock-region**: Tentukan rantau di mana bedrock tersedia. (lalai: us-east-1)
-- **--repo-url**: Repo tersuai Bedrock Chat untuk ditempatkan, jika difork atau kawalan sumber tersuai. (lalai: https://github.com/aws-samples/bedrock-chat.git)
+- **--repo-url**: Repo tersuai Bedrock Chat untuk ditempatkan, jika difork atau kawalan sumber tersuai. (lalai: https://github.com/LinksysJimmy/laila-chat.git)
 - **--version**: Versi Bedrock Chat untuk ditempatkan. (lalai: versi terkini dalam pembangunan)
 - **--cdk-json-override**: Anda boleh mengatasi mana-mana nilai konteks CDK semasa penempatan menggunakan blok JSON override. Ini membolehkan anda mengubah suai konfigurasi tanpa mengedit fail cdk.json secara langsung.
 
@@ -203,7 +203,7 @@ Penempatan Super-mudah menggunakan [AWS CodeBuild](https://aws.amazon.com/codebu
 - Klon repositori ini
 
 ```
-git clone https://github.com/aws-samples/bedrock-chat
+git clone https://github.com/LinksysJimmy/laila-chat
 ```
 
 - Pasang pakej npm
@@ -671,7 +671,7 @@ Sila juga lihat garis panduan berikut sebelum menyumbang:
 
 ## Penyumbang
 
-[![penyumbang bedrock chat](https://contrib.rocks/image?repo=aws-samples/bedrock-chat&max=1000)](https://github.com/aws-samples/bedrock-chat/graphs/contributors)
+[![penyumbang bedrock chat](https://contrib.rocks/image?repo=aws-samples/bedrock-chat&max=1000)](https://github.com/LinksysJimmy/laila-chat/graphs/contributors)
 
 ## Lesen
 

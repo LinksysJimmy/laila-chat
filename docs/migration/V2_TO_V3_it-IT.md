@@ -52,7 +52,7 @@ Il repository è stato rinominato da `bedrock-claude-chat` a `bedrock-chat`. Agg
 git remote -v
 
 # Update the remote URL
-git remote set-url origin https://github.com/aws-samples/bedrock-chat.git
+git remote set-url origin https://github.com/LinksysJimmy/laila-chat.git
 
 # Verify the change
 git remote -v

@@ -71,7 +71,7 @@ v1.4では、[Guardrails for Amazon Bedrock](https://aws.amazon.com/jp/bedrock/g
 
 ![](../imgs/v1_to_v2_KB_s3_source.png)
 
-**WebクローリングやYouTubeトランスクリプトのサポートなど、Knowledge Basesでは利用できない機能があることにご注意ください（Webクローラーのサポートは計画中です[issue](https://github.com/aws-samples/bedrock-chat/issues/557)）。**また、移行期間中はAuroraとKnowledge Basesの両方に料金が発生することにご留意ください。
+**WebクローリングやYouTubeトランスクリプトのサポートなど、Knowledge Basesでは利用できない機能があることにご注意ください（Webクローラーのサポートは計画中です[issue](https://github.com/LinksysJimmy/laila-chat/issues/557)）。**また、移行期間中はAuroraとKnowledge Basesの両方に料金が発生することにご留意ください。
 
 4. **公開済みAPIの削除**: VPCの削除により、v2をデプロイする前にすべての既存のAPIを再公開する必要があります。そのためには、まず既存のAPIを削除する必要があります。[管理者のAPI管理機能](../ADMINISTRATOR_ja-JP.md)を使用するとこのプロセスが簡単になります。すべての`APIPublishmentStackXXXX` CloudFormationスタックの削除が完了すると、環境の準備が整います。
 

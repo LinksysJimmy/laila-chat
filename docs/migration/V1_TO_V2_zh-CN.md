@@ -71,7 +71,7 @@ v1.4还引入了[Amazon Bedrock的防护机制](https://aws.amazon.com/jp/bedroc
 
 ![](../imgs/v1_to_v2_KB_s3_source.png)
 
-**请注意，某些功能在Knowledge Bases上不可用，如网页爬取和YouTube转录支持（计划支持网页爬取器（[issue](https://github.com/aws-samples/bedrock-chat/issues/557)））。**另外，请记住，在过渡期间使用Knowledge Bases将同时产生Aurora和Knowledge Bases的费用。
+**请注意，某些功能在Knowledge Bases上不可用，如网页爬取和YouTube转录支持（计划支持网页爬取器（[issue](https://github.com/LinksysJimmy/laila-chat/issues/557)））。**另外，请记住，在过渡期间使用Knowledge Bases将同时产生Aurora和Knowledge Bases的费用。
 
 4. **删除已发布的API**：由于VPC删除，在部署v2之前需要重新发布所有之前发布的API。为此，您需要先删除现有的API。使用[管理员的API管理功能](../ADMINISTRATOR_zh-CN.md)可以简化此过程。一旦所有`APIPublishmentStackXXXX` CloudFormation堆栈删除完成，环境就准备就绪了。
 

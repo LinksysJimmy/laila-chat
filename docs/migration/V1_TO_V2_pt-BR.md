@@ -71,7 +71,7 @@ Os passos diferem dependendo se você está usando v1.2 ou anterior, ou v1.3.
 
 ![](../imgs/v1_to_v2_KB_s3_source.png)
 
-**Note que alguns recursos não estão disponíveis no Knowledge Bases, como web crawling e suporte a transcrição do YouTube (Planejamento para suportar web crawler ([issue](https://github.com/aws-samples/bedrock-chat/issues/557))).** Além disso, lembre-se que usar o Knowledge Bases incorrerá em cobranças tanto para Aurora quanto para Knowledge Bases durante a transição.
+**Note que alguns recursos não estão disponíveis no Knowledge Bases, como web crawling e suporte a transcrição do YouTube (Planejamento para suportar web crawler ([issue](https://github.com/LinksysJimmy/laila-chat/issues/557))).** Além disso, lembre-se que usar o Knowledge Bases incorrerá em cobranças tanto para Aurora quanto para Knowledge Bases durante a transição.
 
 4. **Remova APIs publicadas**: Todas as APIs previamente publicadas precisarão ser republicadas antes de fazer o deploy da v2 devido à exclusão da VPC. Para isso, você precisará primeiro excluir as APIs existentes. Usar o [recurso de Gerenciamento de API do administrador](../ADMINISTRATOR_pt-BR.md) pode simplificar este processo. Uma vez que a exclusão de todas as stacks CloudFormation `APIPublishmentStackXXXX` estiver completa, o ambiente estará pronto.
 

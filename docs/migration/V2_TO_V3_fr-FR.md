@@ -52,7 +52,7 @@ Le dépôt a été renommé de `bedrock-claude-chat` à `bedrock-chat`. Mettez �
 git remote -v
 
 # Mettez à jour l'URL distante
-git remote set-url origin https://github.com/aws-samples/bedrock-chat.git
+git remote set-url origin https://github.com/LinksysJimmy/laila-chat.git
 
 # Vérifiez le changement
 git remote -v

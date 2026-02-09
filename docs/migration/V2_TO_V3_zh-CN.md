@@ -52,7 +52,7 @@ V3 为 Bedrock Chat 引入了重要增强功能:
 git remote -v
 
 # 更新远程URL
-git remote set-url origin https://github.com/aws-samples/bedrock-chat.git
+git remote set-url origin https://github.com/LinksysJimmy/laila-chat.git
 
 # 验证更改
 git remote -v
