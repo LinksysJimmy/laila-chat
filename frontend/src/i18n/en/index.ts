@@ -155,6 +155,12 @@ const translation = {
         description:
           'Open-weight 120B parameter model with 128K context window and advanced reasoning capabilities.',
       },
+      // Moonshot AI Kimi models
+      'kimi-k2.5': {
+        label: 'Kimi K2.5',
+        description:
+          'Moonshot AI Kimi K2.5 - Advanced language model with strong reasoning and multilingual capabilities.',
+      },
     },
     agent: {
       label: 'Agent',

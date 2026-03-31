@@ -118,49 +118,50 @@ const useModel = (botId?: string | null, activeModels?: ActiveModels) => {
         supportMediaType: CLAUDE_SUPPORTED_MEDIA_TYPES,
         supportReasoning: true,
       },
-      {
-        modelId: 'claude-v3-haiku',
-        label: t('model.claude-v3-haiku.label'),
-        description: t('model.claude-v3-haiku.description'),
-        supportMediaType: CLAUDE_SUPPORTED_MEDIA_TYPES,
-        supportReasoning: false,
-      },
-      {
-        modelId: 'claude-v3.5-haiku',
-        label: t('model.claude-v3.5-haiku.label'),
-        description: t('model.claude-v3.5-haiku.description'),
-        supportMediaType: CLAUDE_SUPPORTED_MEDIA_TYPES,
-        supportReasoning: false,
-      },
-      {
-        modelId: 'claude-v3.5-sonnet',
-        label: t('model.claude-v3.5-sonnet.label'),
-        description: t('model.claude-v3.5-sonnet.description'),
-        supportMediaType: CLAUDE_SUPPORTED_MEDIA_TYPES,
-        supportReasoning: false,
-      },
-      {
-        modelId: 'claude-v3.5-sonnet-v2',
-        label: t('model.claude-v3.5-sonnet-v2.label'),
-        description: t('model.claude-v3.5-sonnet-v2.description'),
-        supportMediaType: CLAUDE_SUPPORTED_MEDIA_TYPES,
-        supportReasoning: false,
-      },
-      {
-        modelId: 'claude-v3.7-sonnet',
-        label: t('model.claude-v3.7-sonnet.label'),
-        description: t('model.claude-v3.7-sonnet.description'),
-        supportMediaType: CLAUDE_SUPPORTED_MEDIA_TYPES,
-        supportReasoning: true,
-      },
-      {
-        modelId: 'claude-v3-opus',
-        label: t('model.claude-v3-opus.label'),
-        description: t('model.claude-v3-opus.description'),
-        supportMediaType: CLAUDE_SUPPORTED_MEDIA_TYPES,
-        supportReasoning: false,
-      },
-      // New Amazon Nova models
+      // Disabled Claude v3 models
+      // {
+      //   modelId: 'claude-v3-haiku',
+      //   label: t('model.claude-v3-haiku.label'),
+      //   description: t('model.claude-v3-haiku.description'),
+      //   supportMediaType: CLAUDE_SUPPORTED_MEDIA_TYPES,
+      //   supportReasoning: false,
+      // },
+      // {
+      //   modelId: 'claude-v3.5-haiku',
+      //   label: t('model.claude-v3.5-haiku.label'),
+      //   description: t('model.claude-v3.5-haiku.description'),
+      //   supportMediaType: CLAUDE_SUPPORTED_MEDIA_TYPES,
+      //   supportReasoning: false,
+      // },
+      // {
+      //   modelId: 'claude-v3.5-sonnet',
+      //   label: t('model.claude-v3.5-sonnet.label'),
+      //   description: t('model.claude-v3.5-sonnet.description'),
+      //   supportMediaType: CLAUDE_SUPPORTED_MEDIA_TYPES,
+      //   supportReasoning: false,
+      // },
+      // {
+      //   modelId: 'claude-v3.5-sonnet-v2',
+      //   label: t('model.claude-v3.5-sonnet-v2.label'),
+      //   description: t('model.claude-v3.5-sonnet-v2.description'),
+      //   supportMediaType: CLAUDE_SUPPORTED_MEDIA_TYPES,
+      //   supportReasoning: false,
+      // },
+      // {
+      //   modelId: 'claude-v3.7-sonnet',
+      //   label: t('model.claude-v3.7-sonnet.label'),
+      //   description: t('model.claude-v3.7-sonnet.description'),
+      //   supportMediaType: CLAUDE_SUPPORTED_MEDIA_TYPES,
+      //   supportReasoning: true,
+      // },
+      // {
+      //   modelId: 'claude-v3-opus',
+      //   label: t('model.claude-v3-opus.label'),
+      //   description: t('model.claude-v3-opus.description'),
+      //   supportMediaType: CLAUDE_SUPPORTED_MEDIA_TYPES,
+      //   supportReasoning: false,
+      // },
+      // Amazon Nova models
       {
         modelId: 'amazon-nova-pro',
         label: t('model.amazon-nova-pro.label'),
@@ -182,94 +183,102 @@ const useModel = (botId?: string | null, activeModels?: ActiveModels) => {
         supportMediaType: [],
         supportReasoning: false,
       },
-      // DeepSeek models
+      // Disabled DeepSeek models
+      // {
+      //   modelId: 'deepseek-r1',
+      //   label: t('model.deepseek-r1.label'),
+      //   description: t('model.deepseek-r1.description'),
+      //   supportMediaType: [],
+      //   supportReasoning: true,
+      //   forceReasoningEnabled: true, // Deep Seek always return reasoning contents.
+      // },
+      // Disabled Meta Llama 3 models
+      // {
+      //   modelId: 'llama3-3-70b-instruct',
+      //   label: t('model.llama3-3-70b-instruct.label'),
+      //   description: t('model.llama3-3-70b-instruct.description'),
+      //   supportMediaType: [],
+      //   supportReasoning: false,
+      // },
+      // {
+      //   modelId: 'llama3-2-1b-instruct',
+      //   label: t('model.llama3-2-1b-instruct.label'),
+      //   description: t('model.llama3-2-1b-instruct.description'),
+      //   supportMediaType: [],
+      //   supportReasoning: false,
+      // },
+      // {
+      //   modelId: 'llama3-2-3b-instruct',
+      //   label: t('model.llama3-2-3b-instruct.label'),
+      //   description: t('model.llama3-2-3b-instruct.description'),
+      //   supportMediaType: [],
+      //   supportReasoning: false,
+      // },
+      // {
+      //   modelId: 'llama3-2-11b-instruct',
+      //   label: t('model.llama3-2-11b-instruct.label'),
+      //   description: t('model.llama3-2-11b-instruct.description'),
+      //   supportMediaType: LLAMA_SUPPORTED_MEDIA_TYPES,
+      //   supportReasoning: false,
+      // },
+      // {
+      //   modelId: 'llama3-2-90b-instruct',
+      //   label: t('model.llama3-2-90b-instruct.label'),
+      //   description: t('model.llama3-2-90b-instruct.description'),
+      //   supportMediaType: LLAMA_SUPPORTED_MEDIA_TYPES,
+      //   supportReasoning: false,
+      // },
+      // Disabled OpenAI GPT-OSS models
+      // {
+      //   modelId: 'gpt-oss-20b',
+      //   label: t('model.gpt-oss-20b.label'),
+      //   description: t('model.gpt-oss-20b.description'),
+      //   supportMediaType: [],
+      //   supportReasoning: true,
+      //   forceReasoningEnabled: true, // GPT-OSS always return reasoning contents.
+      // },
+      // {
+      //   modelId: 'gpt-oss-120b',
+      //   label: t('model.gpt-oss-120b.label'),
+      //   description: t('model.gpt-oss-120b.description'),
+      //   supportMediaType: [],
+      //   supportReasoning: true,
+      //   forceReasoningEnabled: true, // GPT-OSS always return reasoning contents.
+      // },
+      // Disabled Mistral models
+      // {
+      //   modelId: 'mistral-7b-instruct',
+      //   label: t('model.mistral-7b-instruct.label'),
+      //   description: t('model.mistral-7b-instruct.description'),
+      //   supportMediaType: [],
+      //   supportReasoning: false,
+      // },
+      // {
+      //   modelId: 'mixtral-8x7b-instruct',
+      //   label: t('model.mixtral-8x7b-instruct.label'),
+      //   description: t('model.mixtral-8x7b-instruct.description'),
+      //   supportMediaType: [],
+      //   supportReasoning: false,
+      // },
+      // {
+      //   modelId: 'mistral-large',
+      //   label: t('model.mistral-large.label'),
+      //   description: t('model.mistral-large.description'),
+      //   supportMediaType: [],
+      //   supportReasoning: false,
+      // },
+      // {
+      //   modelId: 'mistral-large-2',
+      //   label: t('model.mistral-large-2.label'),
+      //   description: t('model.mistral-large-2.description'),
+      //   supportMediaType: [],
+      //   supportReasoning: false,
+      // },
+      // Moonshot AI Kimi models
       {
-        modelId: 'deepseek-r1',
-        label: t('model.deepseek-r1.label'),
-        description: t('model.deepseek-r1.description'),
-        supportMediaType: [],
-        supportReasoning: true,
-        forceReasoningEnabled: true, // Deep Seek always return reasoning contents.
-      },
-      // Meta Llama 3 models
-      {
-        modelId: 'llama3-3-70b-instruct',
-        label: t('model.llama3-3-70b-instruct.label'),
-        description: t('model.llama3-3-70b-instruct.description'),
-        supportMediaType: [],
-        supportReasoning: false,
-      },
-      {
-        modelId: 'llama3-2-1b-instruct',
-        label: t('model.llama3-2-1b-instruct.label'),
-        description: t('model.llama3-2-1b-instruct.description'),
-        supportMediaType: [],
-        supportReasoning: false,
-      },
-      {
-        modelId: 'llama3-2-3b-instruct',
-        label: t('model.llama3-2-3b-instruct.label'),
-        description: t('model.llama3-2-3b-instruct.description'),
-        supportMediaType: [],
-        supportReasoning: false,
-      },
-      {
-        modelId: 'llama3-2-11b-instruct',
-        label: t('model.llama3-2-11b-instruct.label'),
-        description: t('model.llama3-2-11b-instruct.description'),
-        supportMediaType: LLAMA_SUPPORTED_MEDIA_TYPES,
-        supportReasoning: false,
-      },
-      {
-        modelId: 'llama3-2-90b-instruct',
-        label: t('model.llama3-2-90b-instruct.label'),
-        description: t('model.llama3-2-90b-instruct.description'),
-        supportMediaType: LLAMA_SUPPORTED_MEDIA_TYPES,
-        supportReasoning: false,
-      },
-      // OpenAI GPT-OSS models
-      {
-        modelId: 'gpt-oss-20b',
-        label: t('model.gpt-oss-20b.label'),
-        description: t('model.gpt-oss-20b.description'),
-        supportMediaType: [],
-        supportReasoning: true,
-        forceReasoningEnabled: true, // GPT-OSS always return reasoning contents.
-      },
-      {
-        modelId: 'gpt-oss-120b',
-        label: t('model.gpt-oss-120b.label'),
-        description: t('model.gpt-oss-120b.description'),
-        supportMediaType: [],
-        supportReasoning: true,
-        forceReasoningEnabled: true, // GPT-OSS always return reasoning contents.
-      },
-      // Mistral
-      {
-        modelId: 'mistral-7b-instruct',
-        label: t('model.mistral-7b-instruct.label'),
-        description: t('model.mistral-7b-instruct.description'),
-        supportMediaType: [],
-        supportReasoning: false,
-      },
-      {
-        modelId: 'mixtral-8x7b-instruct',
-        label: t('model.mixtral-8x7b-instruct.label'),
-        description: t('model.mixtral-8x7b-instruct.description'),
-        supportMediaType: [],
-        supportReasoning: false,
-      },
-      {
-        modelId: 'mistral-large',
-        label: t('model.mistral-large.label'),
-        description: t('model.mistral-large.description'),
-        supportMediaType: [],
-        supportReasoning: false,
-      },
-      {
-        modelId: 'mistral-large-2',
-        label: t('model.mistral-large-2.label'),
-        description: t('model.mistral-large-2.description'),
+        modelId: 'kimi-k2.5',
+        label: t('model.kimi-k2.5.label'),
+        description: t('model.kimi-k2.5.description'),
         supportMediaType: [],
         supportReasoning: false,
       },
