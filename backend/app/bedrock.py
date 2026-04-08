@@ -415,6 +415,11 @@ def is_gpt_oss_model(model: type_model_name) -> bool:
     return "gpt-oss" in model
 
 
+def is_kimi_model(model: type_model_name) -> bool:
+    """Check if the model is a Moonshot AI Kimi model"""
+    return "kimi" in model
+
+
 def is_tooluse_supported(model: type_model_name) -> bool:
     """Check if the model is supported for tool use"""
     return model not in [
@@ -622,6 +627,39 @@ def _prepare_gpt_oss_model_params(
     # Note: GPT-OSS models don't support stopSequences, so we don't add it
 
     # No additional fields for GPT-OSS models
+
+    return {
+        "inferenceConfig": inference_config,
+    }
+
+
+def _prepare_kimi_model_params(
+    model: type_model_name, generation_params: Optional[GenerationParamsModel] = None
+) -> ConverseConfiguration:
+    """
+    Prepare inference configuration for Moonshot AI Kimi models
+    Note: Kimi models don't support stopSequences
+    """
+    # Base inference configuration
+    inference_config: InferenceConfiguration = {
+        "maxTokens": (
+            generation_params.max_tokens
+            if generation_params
+            else DEFAULT_GENERATION_CONFIG["max_tokens"]
+        ),
+        "temperature": (
+            generation_params.temperature
+            if generation_params
+            else DEFAULT_GENERATION_CONFIG["temperature"]
+        ),
+        "topP": (
+            generation_params.top_p
+            if generation_params
+            else DEFAULT_GENERATION_CONFIG["top_p"]
+        ),
+    }
+
+    # Note: Kimi models don't support stopSequences, so we don't add it
 
     return {
         "inferenceConfig": inference_config,
@@ -836,6 +874,10 @@ def generation_params_to_converse_configuration(
     elif is_gpt_oss_model(model):
         # Special handling for GPT-OSS models
         converse_configuration = _prepare_gpt_oss_model_params(model, generation_params)
+
+    elif is_kimi_model(model):
+        # Special handling for Kimi models
+        converse_configuration = _prepare_kimi_model_params(model, generation_params)
 
     else:
         # Standard handling for non-Nova models
