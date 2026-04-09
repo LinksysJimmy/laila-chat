@@ -57,8 +57,9 @@ def get_bedrock_agent_runtime_client(region=BEDROCK_REGION):
     return client
 
 
-def get_agentcore_runtime_client(region=BEDROCK_REGION):
-    client = boto3.client("bedrock-agentcore-runtime", region_name=region)
+def get_agentcore_runtime_client(region=None):
+    from app.config import AGENTCORE_REGION
+    client = boto3.client("bedrock-agentcore-runtime", region_name=region or AGENTCORE_REGION)
     return client
 
 

@@ -1,3 +1,5 @@
+import os
+
 from typing_extensions import NotRequired, TypedDict
 
 
@@ -335,3 +337,27 @@ BEDROCK_PRICING = {
         "llama3-2-3b-instruct": {"input": 0.00019, "output": 0.00019},
     },
 }
+
+# AgentCore Configuration
+AGENTCORE_CONFIG = {
+    "linksys": {
+        "agent_runtime_id": "laila_agent_dev-zubMFc4Xdg",
+        "arn": "arn:aws:bedrock-agentcore:us-west-2:799870512242:runtime/laila_agent_dev-zubMFc4Xdg",
+        "region": "us-west-2",
+        "model": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+        "name": "linksys",
+        "description": "Linksys Knowledge Base",
+    },
+}
+
+# Default AgentCore runtime ID (can be overridden by environment variable)
+DEFAULT_AGENTCORE_RUNTIME_ID = os.environ.get(
+    "AGENTCORE_RUNTIME_ID",
+    AGENTCORE_CONFIG["linksys"]["agent_runtime_id"]
+)
+
+# AgentCore region (can be overridden by environment variable)
+AGENTCORE_REGION = os.environ.get(
+    "AGENTCORE_REGION",
+    AGENTCORE_CONFIG["linksys"]["region"]
+)
