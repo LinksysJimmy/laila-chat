@@ -1144,22 +1144,23 @@ def calculate_price(
     cache_write_input_tokens: int,
     region: str = BEDROCK_REGION,
 ) -> float:
+    default_model_pricing = BEDROCK_PRICING["default"].get(model, {})
     input_price = (
         BEDROCK_PRICING.get(region, {})
         .get(model, {})
-        .get("input", BEDROCK_PRICING["default"][model]["input"])
+        .get("input", default_model_pricing.get("input", 0.0))
     )
     output_price = (
         BEDROCK_PRICING.get(region, {})
         .get(model, {})
-        .get("output", BEDROCK_PRICING["default"][model]["output"])
+        .get("output", default_model_pricing.get("output", 0.0))
     )
     cache_read_input_price = (
         BEDROCK_PRICING.get(region, {})
         .get(model, {})
         .get(
             "cache_read_input",
-            BEDROCK_PRICING["default"][model].get("cache_read_input", input_price),
+            default_model_pricing.get("cache_read_input", input_price),
         )
     )
     cache_write_input_price = (
@@ -1167,7 +1168,7 @@ def calculate_price(
         .get(model, {})
         .get(
             "cache_write_input",
-            BEDROCK_PRICING["default"][model].get("cache_write_input", input_price),
+            default_model_pricing.get("cache_write_input", input_price),
         )
     )
 
