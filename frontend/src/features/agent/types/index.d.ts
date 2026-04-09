@@ -13,11 +13,15 @@ export type FirecrawlConfig = {
 };
 
 export type SearchEngine = 'duckduckgo' | 'firecrawl';
-export type ToolType = 'internet' | 'plain' | 'bedrock_agent';
+export type ToolType = 'internet' | 'plain' | 'bedrock_agent' | 'agentcore';
 
 export type BedrockAgentConfig = {
   agentId: string;
   aliasId: string;
+};
+
+export type AgentCoreConfig = {
+  agentRuntimeId: string;
 };
 
 export type InternetAgentTool = {
@@ -41,7 +45,14 @@ export type BedrockAgentTool = {
   bedrockAgentConfig?: BedrockAgentConfig;
 };
 
-export type AgentTool = InternetAgentTool | PlainAgentTool | BedrockAgentTool;
+export type AgentCoreTool = {
+  toolType: 'agentcore';
+  name: string;
+  description: string;
+  agentCoreConfig?: AgentCoreConfig;
+};
+
+export type AgentTool = InternetAgentTool | PlainAgentTool | BedrockAgentTool | AgentCoreTool;
 
 export type Agent = {
   tools: AgentTool[];

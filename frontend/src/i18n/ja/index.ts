@@ -156,6 +156,11 @@ const translation: typeof en = {
         description:
           '128Kコンテキストウィンドウと高度な推論機能を持つオープンウェイト120Bパラメータモデル',
       },
+      'kimi-k2.5': {
+        label: 'Kimi K2.5',
+        description:
+          'Moonshot AIの高性能モデル。長いコンテキストウィンドウと優れた推論能力を提供',
+      },
     },
     agent: {
       label: 'エージェント',
@@ -237,6 +242,14 @@ const translation: typeof en = {
           aliasId: {
             label: 'Alias ID',
             placeholder: 'Alias IDを入力',
+          },
+        },
+        agentCore: {
+          name: 'AgentCore',
+          description: 'AWS Bedrock AgentCoreをツールとして使用します。',
+          agentRuntimeId: {
+            label: 'Agent Runtime ID',
+            placeholder: 'Agent Runtime IDを入力',
           },
         },
       },

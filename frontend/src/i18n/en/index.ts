@@ -244,6 +244,14 @@ const translation = {
             placeholder: 'Enter Alias ID',
           },
         },
+        agentCore: {
+          name: 'AgentCore',
+          description: 'Use AWS Bedrock AgentCore as a tool.',
+          agentRuntimeId: {
+            label: 'Agent Runtime ID',
+            placeholder: 'Enter Agent Runtime ID',
+          },
+        },
       },
     },
     bot: {

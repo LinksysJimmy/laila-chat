@@ -1,6 +1,8 @@
 import { Trans, useTranslation } from 'react-i18next';
 import {
   AgentTool,
+  AgentCoreConfig,
+  AgentCoreTool,
   BedrockAgentConfig,
   BedrockAgentTool,
   FirecrawlConfig,
@@ -8,7 +10,7 @@ import {
   SearchEngine,
   ToolType,
 } from '../types';
-import { isInternetTool, isBedrockAgentTool } from '../utils/typeGuards';
+import { isInternetTool, isBedrockAgentTool, isAgentCoreTool } from '../utils/typeGuards';
 import Toggle from '../../../components/Toggle';
 import { Dispatch, useCallback, useState, useEffect } from 'react';
 import { formatDescription } from '../functions/formatDescription';
@@ -17,6 +19,7 @@ import Skeleton from '../../../components/Skeleton';
 import { TooltipDirection } from '../../../constants';
 import { FirecrawlConfig as FirecrawlConfigComponent } from './FirecrawlConfig';
 import { BedrockAgentConfig as BedrockAgentConfigComponent } from './BedrockAgentConfig';
+import { AgentCoreConfig as AgentCoreConfigComponent } from './AgentCoreConfig';
 import ExpandableDrawerGroup from '../../../components/ExpandableDrawerGroup';
 import RadioButton from '../../../components/RadioButton';
 import { DEFAULT_FIRECRAWL_CONFIG } from '../constants';
@@ -76,6 +79,28 @@ export const AvailableTools = ({ availableTools, tools, setTools }: Props) => {
 
           return newTools;
         });
+      } else if (tool.name === 'agentcore') {
+        setTools((preTools) => {
+          const isEnabled = preTools
+            ?.map(({ name }) => name)
+            .includes(tool.name);
+
+          const newTools = isEnabled
+            ? [...preTools.filter(({ name }) => name != tool.name)]
+            : [
+                ...preTools,
+                {
+                  ...tool,
+                  toolType: 'agentcore' as ToolType,
+                  name: 'agentcore',
+                  agentCoreConfig: {
+                    agentRuntimeId: '',
+                  },
+                } as AgentTool,
+              ];
+
+          return newTools;
+        });
       } else {
         setTools((preTools) =>
           preTools?.map(({ name }) => name).includes(tool.name)
@@ -119,6 +144,25 @@ export const AvailableTools = ({ availableTools, tools, setTools }: Props) => {
               toolType: 'bedrock_agent' as ToolType,
               name: 'bedrock_agent',
               bedrockAgentConfig: config,
+            } as AgentTool;
+          }
+          return tool;
+        })
+      );
+    },
+    [setTools]
+  );
+
+  const handleAgentCoreConfigChange = useCallback(
+    (config: AgentCoreConfig) => {
+      setTools((prevTools) =>
+        prevTools.map((tool) => {
+          if (tool.name === 'agentcore') {
+            return {
+              ...tool,
+              toolType: 'agentcore' as ToolType,
+              name: 'agentcore',
+              agentCoreConfig: config,
             } as AgentTool;
           }
           return tool;
@@ -288,6 +332,24 @@ export const AvailableTools = ({ availableTools, tools, setTools }: Props) => {
                       }
                     }
                     onChange={handleBedrockAgentConfigChange}
+                  />
+                </div>
+              </div>
+            )}
+          {tool.name === 'agentcore' &&
+            tools?.map(({ name }) => name).includes('agentcore') && (
+              <div className="space-y-4">
+                <div className="ml-6 text-sm">
+                  <AgentCoreConfigComponent
+                    config={
+                      tools.find(
+                        (t): t is AgentCoreTool =>
+                          t.name === 'agentcore' && isAgentCoreTool(t)
+                      )?.agentCoreConfig || {
+                        agentRuntimeId: '',
+                      }
+                    }
+                    onChange={handleAgentCoreConfigChange}
                   />
                 </div>
               </div>

@@ -6,7 +6,11 @@ import logging
 from typing import Dict
 
 from app.bedrock import is_tooluse_supported
-from app.repositories.models.custom_bot import BedrockAgentToolModel, BotModel
+from app.repositories.models.custom_bot import (
+    AgentCoreToolModel,
+    BedrockAgentToolModel,
+    BotModel,
+)
 from app.routes.schemas.conversation import type_model_name
 from strands.types.tools import AgentTool as StrandsAgentTool
 
@@ -16,6 +20,7 @@ logger.setLevel(logging.INFO)
 
 def get_strands_registered_tools(bot: BotModel | None = None) -> list[StrandsAgentTool]:
     """Get list of available Strands tools."""
+    from app.strands_integration.tools.agentcore import create_agentcore_tool
     from app.strands_integration.tools.bedrock_agent import create_bedrock_agent_tool
     from app.strands_integration.tools.calculator import create_calculator_tool
     from app.strands_integration.tools.internet_search import (
@@ -26,6 +31,7 @@ def get_strands_registered_tools(bot: BotModel | None = None) -> list[StrandsAge
     tools: list[StrandsAgentTool] = []
     tools.append(create_internet_search_tool(bot))
     tools.append(create_bedrock_agent_tool(bot))
+    tools.append(create_agentcore_tool(bot))
     # tools.append(create_calculator_tool(bot))  # For testing purposes
     return tools
 

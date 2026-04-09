@@ -57,6 +57,11 @@ def get_bedrock_agent_runtime_client(region=BEDROCK_REGION):
     return client
 
 
+def get_agentcore_runtime_client(region=BEDROCK_REGION):
+    client = boto3.client("bedrock-agentcore-runtime", region_name=region)
+    return client
+
+
 def get_current_time():
     # Get current time as milliseconds epoch time
     return int(datetime.now().timestamp() * 1000)

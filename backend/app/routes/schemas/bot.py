@@ -101,6 +101,10 @@ class BedrockAgentConfig(BaseSchema):
     alias_id: str
 
 
+class AgentCoreConfig(BaseSchema):
+    agent_runtime_id: str
+
+
 class PlainTool(BaseSchema):
     tool_type: Literal["plain"] = "plain"
     name: str
@@ -136,8 +140,15 @@ class BedrockAgentTool(BaseSchema):
     bedrockAgentConfig: Optional[BedrockAgentConfig] | None = None
 
 
+class AgentCoreTool(BaseSchema):
+    tool_type: Literal["agentcore"]
+    name: str
+    description: str
+    agentCoreConfig: Optional[AgentCoreConfig] | None = None
+
+
 Tool = Annotated[
-    PlainTool | InternetTool | BedrockAgentTool, Discriminator("tool_type")
+    PlainTool | InternetTool | BedrockAgentTool | AgentCoreTool, Discriminator("tool_type")
 ]
 
 

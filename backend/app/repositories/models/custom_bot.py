@@ -8,6 +8,8 @@ from app.repositories.models.custom_bot_kb import BedrockKnowledgeBaseModel
 from app.routes.schemas.bot import (
     ActiveModelsOutput,
     Agent,
+    AgentCoreConfig,
+    AgentCoreTool,
     AgentInput,
     BedrockAgentConfig,
     BedrockAgentTool,
@@ -226,6 +228,10 @@ class BedrockAgentConfigModel(BaseModel):
     alias_id: str
 
 
+class AgentCoreConfigModel(BaseModel):
+    agent_runtime_id: str
+
+
 class BedrockAgentToolModel(BaseModel):
     tool_type: Literal["bedrock_agent"] = Field(
         "bedrock_agent",
@@ -252,8 +258,33 @@ class BedrockAgentToolModel(BaseModel):
         )
 
 
+class AgentCoreToolModel(BaseModel):
+    tool_type: Literal["agentcore"] = Field(
+        "agentcore",
+        description="Type of tool. It does need additional settings for the agentcore.",
+    )
+    name: str
+    description: str
+    agentCoreConfig: Optional[AgentCoreConfigModel] | None = None
+
+    @classmethod
+    def from_tool_input(cls, tool: AgentCoreTool) -> Self:
+        return cls(
+            tool_type="agentcore",
+            name=tool.name,
+            description=tool.description,
+            agentCoreConfig=(
+                AgentCoreConfigModel(
+                    agent_runtime_id=tool.agentCoreConfig.agent_runtime_id,
+                )
+                if tool.agentCoreConfig
+                else None
+            ),
+        )
+
+
 ToolModel = Annotated[
-    PlainToolModel | InternetToolModel | BedrockAgentToolModel,
+    PlainToolModel | InternetToolModel | BedrockAgentToolModel | AgentCoreToolModel,
     Discriminator("tool_type"),
 ]
 
@@ -293,6 +324,8 @@ class AgentModel(BaseModel):
                 )
             elif tool_input.tool_type == "bedrock_agent":
                 tools.append(BedrockAgentToolModel.from_tool_input(tool_input))
+            elif tool_input.tool_type == "agentcore":
+                tools.append(AgentCoreToolModel.from_tool_input(tool_input))
 
         return cls(tools=tools)
 
@@ -329,6 +362,19 @@ class AgentModel(BaseModel):
                         bedrockAgentConfig=(
                             BedrockAgentConfig(**tool.bedrockAgentConfig.model_dump())
                             if tool.bedrockAgentConfig
+                            else None
+                        ),
+                    )
+                )
+            elif isinstance(tool, AgentCoreToolModel):
+                tools.append(
+                    AgentCoreTool(
+                        tool_type="agentcore",
+                        name=tool.name,
+                        description=tool.description,
+                        agentCoreConfig=(
+                            AgentCoreConfig(**tool.agentCoreConfig.model_dump())
+                            if tool.agentCoreConfig
                             else None
                         ),
                     )
