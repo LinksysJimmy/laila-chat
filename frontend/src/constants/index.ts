@@ -83,9 +83,9 @@ export const GUARDRAILS_CONTEXTUAL_GROUNDING_THRESHOLD = {
 
 export const AVAILABLE_MODEL_KEYS = [
   // 'claude-v4-opus',
-  'claude-v4.1-opus',
+  // 'claude-v4.1-opus',
   'claude-v4.5-opus',
-  'claude-v4-sonnet',
+  // 'claude-v4-sonnet',
   'claude-v4.5-sonnet',
   'claude-v4.5-haiku',
   // Disabled Claude v3 models
@@ -100,9 +100,9 @@ export const AVAILABLE_MODEL_KEYS = [
   // 'mixtral-8x7b-instruct',
   // 'mistral-large',
   // 'mistral-large-2',
-  'amazon-nova-pro',
-  'amazon-nova-lite',
-  'amazon-nova-micro',
+  // 'amazon-nova-pro',
+  // 'amazon-nova-lite',
+  // 'amazon-nova-micro',
   // Disabled DeepSeek models
   // 'deepseek-r1',
   // Disabled Meta Llama models

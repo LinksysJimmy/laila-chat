@@ -23,13 +23,6 @@ const NOVA_SUPPORTED_MEDIA_TYPES = [
   'image/webp',
 ];
 
-const LLAMA_SUPPORTED_MEDIA_TYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-];
-
 const useModelState = create<{
   modelId: Model | undefined;
   setModelId: (m: Model) => void;
