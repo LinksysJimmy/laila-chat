@@ -8,6 +8,39 @@ import { PostStreamingStatus } from '../constants';
 const WS_ENDPOINT: string = import.meta.env.VITE_APP_WS_ENDPOINT;
 const CHUNK_SIZE = 32 * 1024; //32KB
 
+// Helper to get GitHub tokens from localStorage
+const getGitHubToken = (): string | null => {
+  try {
+    const stored = localStorage.getItem('github_tokens');
+    if (!stored) return null;
+    const tokens = JSON.parse(stored);
+    if (tokens.idToken && tokens.expiresAt > Date.now()) {
+      return tokens.idToken;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
+
+// Get auth token from Cognito or GitHub
+const getAuthToken = async (): Promise<string | undefined> => {
+  // First try Cognito
+  try {
+    const session = await fetchAuthSession();
+    const cognitoToken = session.tokens?.idToken?.toString();
+    if (cognitoToken) {
+      return cognitoToken;
+    }
+  } catch {
+    // Cognito auth failed, try GitHub
+  }
+
+  // Fallback to GitHub token
+  const githubToken = getGitHubToken();
+  return githubToken || undefined;
+};
+
 const usePostMessageStreaming = create<{
   post: (params: {
     input: PostMessageRequest;
@@ -21,7 +54,7 @@ const usePostMessageStreaming = create<{
     post: async ({ input, handleStreamingEvent }) => {
       handleStreamingEvent({ type: 'wakeup' });
 
-      const token = (await fetchAuthSession()).tokens?.idToken?.toString();
+      const token = await getAuthToken();
       const payloadString = JSON.stringify({
         ...input,
         token,
