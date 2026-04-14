@@ -10,6 +10,7 @@ from app.repositories.common import (
     ResourceConflictError,
 )
 from app.routes.admin import router as admin_router
+from app.routes.agentcore import router as agentcore_router
 from app.routes.api_publication import router as api_publication_router
 from app.routes.bot import router as bot_router
 from app.routes.bot_store import router as bot_store_router
@@ -67,6 +68,7 @@ if not is_published_api:
     app.include_router(user_router)
     app.include_router(bot_store_router)
     app.include_router(global_config_router)
+    app.include_router(agentcore_router)
 else:
     app.include_router(published_api_router)
 

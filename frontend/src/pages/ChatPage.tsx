@@ -10,6 +10,7 @@ import InputChatContent from '../components/InputChatContent';
 import useChat from '../hooks/useChat';
 import { AttachmentType } from '../hooks/useChat';
 import ChatMessage from '../components/ChatMessage';
+import ChatMessageMarkdown from '../components/ChatMessageMarkdown';
 import useScroll from '../hooks/useScroll';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -22,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import SwitchBedrockModel from '../components/SwitchBedrockModel';
 import useSnackbar from '../hooks/useSnackbar';
 import useBot from '../hooks/useBot';
+import useAgentCoreChat from '../hooks/useAgentCoreChat';
 import useConversation from '../hooks/useConversation';
 import { ActiveModels, BotSummary } from '../@types/bot';
 import IconPinnedBot from '../components/IconPinnedBot.tsx';
@@ -70,81 +72,99 @@ type ChatMessageWithRelatedDocumentsProps = {
   onSubmitFeedback?: (messageId: string, feedback: PutFeedbackRequest) => void;
 };
 
-const ChatMessageWithRelatedDocuments: React.FC<ChatMessageWithRelatedDocumentsProps> = React.memo((props) => {
-  const { t } = useTranslation();
-  const { chatContent: message } = props;
+const ChatMessageWithRelatedDocuments: React.FC<ChatMessageWithRelatedDocumentsProps> =
+  React.memo((props) => {
+    const { t } = useTranslation();
+    const { chatContent: message } = props;
 
-  const isAgentThinking = useMemo(() => {
-    switch (props.streamingStateValue) {
-      case StreamingState.STREAMING:
-      case StreamingState.LEAVING:
-        return props.isStreaming;
-      default:
-        return false;
-    }
-  }, [props.streamingStateValue, props.isStreaming]);
-
-  const reasoning = useMemo(() => (
-    isAgentThinking ? props.streamingReasoning : ''
-  ), [isAgentThinking, props.streamingReasoning]);
-
-  const tools: AgentToolsProps[] | undefined = useMemo(() => {
-    if (isAgentThinking) {
-      if (props.streamingTools.length > 0) {
-        return props.streamingTools;
+    const isAgentThinking = useMemo(() => {
+      switch (props.streamingStateValue) {
+        case StreamingState.STREAMING:
+        case StreamingState.LEAVING:
+          return props.isStreaming;
+        default:
+          return false;
       }
+    }, [props.streamingStateValue, props.isStreaming]);
 
-      if (props.botHasAgent) {
-        return [{ thought: t('agent.progress.label'), tools: {} }];
-      }
+    const reasoning = useMemo(
+      () => (isAgentThinking ? props.streamingReasoning : ''),
+      [isAgentThinking, props.streamingReasoning]
+    );
 
-      if (props.botHasKnowledge) {
-        return [{ thought: t('bot.label.retrievingKnowledge'), tools: {} }];
-      }
-
-      return undefined;
-    } else {
-      if (props.botHasKnowledge) {
-        const pseudoToolUseId = message.id;
-        const relatedDocumentsOfVectorSearch = getRelatedDocumentsOfToolUse(
-          props.relatedDocuments,
-          pseudoToolUseId
-        );
-        if (relatedDocumentsOfVectorSearch != null && relatedDocumentsOfVectorSearch.length > 0) {
-          return [{
-            tools: {
-              [pseudoToolUseId]: {
-                name: 'knowledge_base_tool',
-                status: 'success',
-                input: {},
-                relatedDocuments: relatedDocumentsOfVectorSearch,
-              },
-            },
-          }];
+    const tools: AgentToolsProps[] | undefined = useMemo(() => {
+      if (isAgentThinking) {
+        if (props.streamingTools.length > 0) {
+          return props.streamingTools;
         }
+
+        if (props.botHasAgent) {
+          return [{ thought: t('agent.progress.label'), tools: {} }];
+        }
+
+        if (props.botHasKnowledge) {
+          return [{ thought: t('bot.label.retrievingKnowledge'), tools: {} }];
+        }
+
+        return undefined;
+      } else {
+        if (props.botHasKnowledge) {
+          const pseudoToolUseId = message.id;
+          const relatedDocumentsOfVectorSearch = getRelatedDocumentsOfToolUse(
+            props.relatedDocuments,
+            pseudoToolUseId
+          );
+          if (
+            relatedDocumentsOfVectorSearch != null &&
+            relatedDocumentsOfVectorSearch.length > 0
+          ) {
+            return [
+              {
+                tools: {
+                  [pseudoToolUseId]: {
+                    name: 'knowledge_base_tool',
+                    status: 'success',
+                    input: {},
+                    relatedDocuments: relatedDocumentsOfVectorSearch,
+                  },
+                },
+              },
+            ];
+          }
+        }
+        return undefined;
       }
-      return undefined;
-    }
-  }, [isAgentThinking, props.streamingTools, props.botHasAgent, props.botHasKnowledge, message.id, props.relatedDocuments, t]);
+    }, [
+      isAgentThinking,
+      props.streamingTools,
+      props.botHasAgent,
+      props.botHasKnowledge,
+      message.id,
+      props.relatedDocuments,
+      t,
+    ]);
 
-  const relatedDocumentsForCitation = useMemo(
-    () => isAgentThinking ? props.streamingRelatedDocuments : props.relatedDocuments,
-    [isAgentThinking, props.streamingRelatedDocuments, props.relatedDocuments]
-  );
+    const relatedDocumentsForCitation = useMemo(
+      () =>
+        isAgentThinking
+          ? props.streamingRelatedDocuments
+          : props.relatedDocuments,
+      [isAgentThinking, props.streamingRelatedDocuments, props.relatedDocuments]
+    );
 
-  return (
-    <ChatMessage
-      tools={tools}
-      reasoning={reasoning}
-      chatContent={message}
-      isStreaming={props.isStreaming}
-      relatedDocuments={relatedDocumentsForCitation}
-      onChangeMessageId={props.onChangeMessageId}
-      onSubmit={props.onSubmit}
-      onSubmitFeedback={props.onSubmitFeedback}
-    />
-  );
-});
+    return (
+      <ChatMessage
+        tools={tools}
+        reasoning={reasoning}
+        chatContent={message}
+        isStreaming={props.isStreaming}
+        relatedDocuments={relatedDocumentsForCitation}
+        onChangeMessageId={props.onChangeMessageId}
+        onSubmit={props.onSubmit}
+        onSubmitFeedback={props.onSubmitFeedback}
+      />
+    );
+  });
 
 // Default model activation settings when no bot is selected
 const defaultActiveModels: ActiveModels = (() => {
@@ -218,6 +238,9 @@ const ChatPage: React.FC = () => {
     mutate: mutateBot,
   } = useBotSummary(botId ?? undefined);
 
+  const isAgentCoreBot = bot?.backendType === 'agentcore';
+  const agentCoreChat = useAgentCoreChat();
+
   const [pageTitle, setPageTitle] = useState('');
   const [isAvailabilityBot, setIsAvailabilityBot] = useState(false);
 
@@ -285,6 +308,10 @@ const ChatPage: React.FC = () => {
       base64EncodedImages?: string[],
       attachments?: AttachmentType[]
     ) => {
+      if (isAgentCoreBot) {
+        agentCoreChat.sendMessage(content);
+        return;
+      }
       postChat({
         content,
         base64EncodedImages,
@@ -293,7 +320,7 @@ const ChatPage: React.FC = () => {
         enableReasoning,
       });
     },
-    [inputBotParams, postChat]
+    [isAgentCoreBot, agentCoreChat, inputBotParams, postChat]
   );
 
   const onChangeCurrentMessageId = useCallback(
@@ -555,9 +582,13 @@ const ChatPage: React.FC = () => {
               id="messages"
               role="presentation"
               className="flex h-full flex-col overflow-auto pb-16">
-              {messages?.length === 0 ? (
+              {(
+                isAgentCoreBot
+                  ? agentCoreChat.messages.length === 0
+                  : messages?.length === 0
+              ) ? (
                 <div className="relative mb-[45vh]  flex w-full flex-col items-center justify-center">
-                  {!loadingConversation && (
+                  {!loadingConversation && !isAgentCoreBot && (
                     <SwitchBedrockModel
                       className="mb-6 mt-3 w-min"
                       activeModels={activeModels}
@@ -588,6 +619,51 @@ const ChatPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
+              ) : isAgentCoreBot ? (
+                <>
+                  {agentCoreChat.messages.map((message, idx) => (
+                    <div
+                      key={`${message.role}-${message.timestamp}`}
+                      className={`${
+                        message.role === 'assistant'
+                          ? 'bg-aws-squid-ink-light/5 dark:bg-aws-squid-ink-dark/35'
+                          : ''
+                      }`}>
+                      <div className="mx-auto w-11/12 py-3 md:w-10/12 lg:w-4/6 xl:w-3/6">
+                        <div className="mb-1 text-xs font-bold text-dark-gray dark:text-light-gray">
+                          {message.role === 'user'
+                            ? t('app.userLabel', 'You')
+                            : pageTitle}
+                        </div>
+                        <ChatMessageMarkdown messageId={`agentcore-${idx}`}>
+                          {message.content}
+                        </ChatMessageMarkdown>
+                      </div>
+                      <div className="w-full border-b border-aws-squid-ink-light/10 dark:border-aws-squid-ink-dark/10"></div>
+                    </div>
+                  ))}
+                  {agentCoreChat.isLoading && (
+                    <div className="bg-aws-squid-ink-light/5 dark:bg-aws-squid-ink-dark/35">
+                      <div className="mx-auto w-11/12 py-3 md:w-10/12 lg:w-4/6 xl:w-3/6">
+                        <div className="mb-1 text-xs font-bold text-dark-gray dark:text-light-gray">
+                          {pageTitle}
+                        </div>
+                        <div className="flex items-center gap-2 text-dark-gray dark:text-light-gray">
+                          <div className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          {t('app.chatWaitingSymbol', 'Processing...')}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {agentCoreChat.error && (
+                    <div className="mb-12 mt-2 flex flex-col items-center">
+                      <div className="flex items-center font-bold text-red">
+                        <PiWarningCircleFill className="mr-1 text-2xl" />
+                        {agentCoreChat.error}
+                      </div>
+                    </div>
+                  )}
+                </>
               ) : (
                 <>
                   {messages?.map((message, idx, array) => (
@@ -603,7 +679,9 @@ const ChatPage: React.FC = () => {
                         isStreaming={postingMessage && idx + 1 === array.length}
                         streamingReasoning={streamingState.context.reasoning}
                         streamingTools={streamingState.context.tools}
-                        streamingRelatedDocuments={streamingState.context.relatedDocuments}
+                        streamingRelatedDocuments={
+                          streamingState.context.relatedDocuments
+                        }
                         streamingStateValue={streamingState.value as string}
                         botHasAgent={bot?.hasAgent ?? false}
                         botHasKnowledge={bot?.hasKnowledge ?? false}
@@ -650,9 +728,15 @@ const ChatPage: React.FC = () => {
       <div
         className={twMerge(
           'bottom-0 z-0 flex w-full flex-col items-center justify-center',
-          messages.length === 0 ? 'absolute top-2/3 -translate-y-1/2' : ''
+          (
+            isAgentCoreBot
+              ? agentCoreChat.messages.length === 0
+              : messages.length === 0
+          )
+            ? 'absolute top-2/3 -translate-y-1/2'
+            : ''
         )}>
-        {bot && bot.syncStatus !== SyncStatus.SUCCEEDED && (
+        {bot && !isAgentCoreBot && bot.syncStatus !== SyncStatus.SUCCEEDED && (
           <div className="mb-8 w-1/2">
             <Alert
               severity="warning"
@@ -661,7 +745,9 @@ const ChatPage: React.FC = () => {
             </Alert>
           </div>
         )}
-        {messages.length === 0 && (
+        {(isAgentCoreBot
+          ? agentCoreChat.messages.length === 0
+          : messages.length === 0) && (
           <div className="mb-3 flex w-11/12 flex-wrap-reverse justify-start gap-2 md:w-10/12 lg:w-4/6 xl:w-3/6">
             {bot?.conversationQuickStarters?.map((qs, idx) => (
               <div
@@ -682,7 +768,11 @@ const ChatPage: React.FC = () => {
         <InputChatContent
           className="mb-7 w-11/12 md:w-10/12 lg:w-4/6 xl:w-3/6"
           dndMode={dndMode}
-          disabledSend={postingMessage || hasError || isLastAssistantMessageEmpty}
+          disabledSend={
+            isAgentCoreBot
+              ? agentCoreChat.isLoading
+              : postingMessage || hasError || isLastAssistantMessageEmpty
+          }
           disabledRegenerate={postingMessage || hasError}
           disabledContinue={postingMessage || hasError}
           disabled={disabledInput}
@@ -691,15 +781,19 @@ const ChatPage: React.FC = () => {
               ? t('bot.label.notAvailableBotInputMessage')
               : undefined
           }
-          canRegenerate={messages.length > 1}
-          canContinue={getShouldContinue()}
-          isLoading={postingMessage}
-          isNewChat={messages.length == 0}
+          canRegenerate={isAgentCoreBot ? false : messages.length > 1}
+          canContinue={isAgentCoreBot ? false : getShouldContinue()}
+          isLoading={isAgentCoreBot ? agentCoreChat.isLoading : postingMessage}
+          isNewChat={
+            isAgentCoreBot
+              ? agentCoreChat.messages.length === 0
+              : messages.length == 0
+          }
           onSend={onSend}
           onRegenerate={onRegenerate}
           continueGenerate={onContinueGenerate}
           ref={focusInputRef}
-          supportReasoning={supportReasoning}
+          supportReasoning={isAgentCoreBot ? false : supportReasoning}
           reasoningEnabled={reasoningEnabled}
           onChangeReasoning={setReasoningEnabled}
         />

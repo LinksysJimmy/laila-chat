@@ -87,6 +87,14 @@ export class Api extends Construct {
     );
     handlerRole.addToPolicy(
       new iam.PolicyStatement({
+        actions: ["bedrock-agentcore:InvokeAgentRuntime"],
+        resources: [
+          `arn:aws:bedrock-agentcore:us-west-2:${Stack.of(this).account}:runtime/*`,
+        ],
+      })
+    );
+    handlerRole.addToPolicy(
+      new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
         actions: ["codebuild:StartBuild"],
         resources: [
@@ -264,7 +272,8 @@ export class Api extends Construct {
         DOCUMENT_BUCKET: props.documentBucket.bucketName,
         LARGE_MESSAGE_BUCKET: props.largeMessageBucket.bucketName,
         PUBLISH_API_CODEBUILD_PROJECT_NAME: props.apiPublishProject.projectName,
-        EMBEDDING_STATE_MACHINE_ARN: props.embeddingStateMachine.stateMachineArn,
+        EMBEDDING_STATE_MACHINE_ARN:
+          props.embeddingStateMachine.stateMachineArn,
         USAGE_ANALYSIS_DATABASE:
           props.usageAnalysis?.database.databaseName || "",
         USAGE_ANALYSIS_TABLE:
@@ -275,7 +284,7 @@ export class Api extends Construct {
           props.enableBedrockGlobalInference.toString(),
         ENABLE_BEDROCK_CROSS_REGION_INFERENCE:
           props.enableBedrockCrossRegionInference.toString(),
-        GLOBAL_AVAILABLE_MODELS: props.globalAvailableModels 
+        GLOBAL_AVAILABLE_MODELS: props.globalAvailableModels
           ? JSON.stringify(props.globalAvailableModels)
           : "[]",
         DEFAULT_MODEL: props.defaultModel || "",
@@ -283,6 +292,9 @@ export class Api extends Construct {
         OPENSEARCH_DOMAIN_ENDPOINT: props.openSearchEndpoint || "",
         LOGO_PATH: props.logoPath || "",
         USE_STRANDS: "true",
+        AGENTCORE_RUNTIME_ARN:
+          "arn:aws:bedrock-agentcore:us-west-2:799870512242:runtime/laila_agent_dev-zubMFc4Xdg",
+        AGENTCORE_REGION: "us-west-2",
         AWS_LAMBDA_EXEC_WRAPPER: "/opt/bootstrap",
         PORT: "8000",
       },

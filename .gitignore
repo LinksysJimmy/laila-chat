@@ -9,3 +9,11 @@ AmazonQ.md
 memory-bank
 .clinerules
 .serena
+
+.idea
+
+# Playwright MCP
+.playwright-mcp/
+
+# E2E test screenshots
+e2e-test*.png
