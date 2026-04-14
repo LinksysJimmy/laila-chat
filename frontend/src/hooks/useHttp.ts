@@ -7,12 +7,39 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_APP_API_ENDPOINT,
 });
 
-// // HTTP Request Preprocessing
+// Helper to get GitHub tokens from localStorage
+const getGitHubToken = (): string | null => {
+  try {
+    const stored = localStorage.getItem('github_tokens');
+    if (!stored) return null;
+    const tokens = JSON.parse(stored);
+    if (tokens.idToken && tokens.expiresAt > Date.now()) {
+      return tokens.idToken;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
+
+// HTTP Request Preprocessing
 api.interceptors.request.use(async (config) => {
-  // If Authenticated, append ID Token to Request Header
-  const idToken = (await fetchAuthSession()).tokens?.idToken;
-  if (idToken) {
-    config.headers['Authorization'] = 'Bearer ' + idToken.toString();
+  // First try Cognito token
+  try {
+    const idToken = (await fetchAuthSession()).tokens?.idToken;
+    if (idToken) {
+      config.headers['Authorization'] = 'Bearer ' + idToken.toString();
+      config.headers['Content-Type'] = 'application/json';
+      return config;
+    }
+  } catch {
+    // Cognito auth failed, try GitHub token
+  }
+
+  // Fallback to GitHub token
+  const githubToken = getGitHubToken();
+  if (githubToken) {
+    config.headers['Authorization'] = 'Bearer ' + githubToken;
   }
   config.headers['Content-Type'] = 'application/json';
 

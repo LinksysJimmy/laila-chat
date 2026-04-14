@@ -59,12 +59,14 @@ const App: React.FC = () => {
     // Landing page mode with GitHub support
     if (landingPageEnabled || githubEnabled) {
       return (
-        <AuthLanding
-          githubEnabled={githubEnabled}
-          socialProviders={socialProviderFromEnv}
-        >
-          <AppContent />
-        </AuthLanding>
+        <Authenticator.Provider>
+          <AuthLanding
+            githubEnabled={githubEnabled}
+            socialProviders={socialProviderFromEnv}
+          >
+            <AppContent />
+          </AuthLanding>
+        </Authenticator.Provider>
       );
     }
 
