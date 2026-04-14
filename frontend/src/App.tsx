@@ -5,6 +5,7 @@ import { I18n } from 'aws-amplify/utils';
 import '@aws-amplify/ui-react/styles.css';
 import AuthAmplify from './components/AuthAmplify';
 import AuthCustom from './components/AuthCustom';
+import AuthLanding from './components/AuthLanding';
 import { Authenticator } from '@aws-amplify/ui-react';
 import { useTranslation } from 'react-i18next';
 import './i18n';
@@ -15,6 +16,11 @@ import ErrorFallback from './pages/ErrorFallback';
 
 const customProviderEnabled =
   import.meta.env.VITE_APP_CUSTOM_PROVIDER_ENABLED === 'true';
+const landingPageEnabled =
+  import.meta.env.VITE_APP_LANDING_PAGE_ENABLED === 'true';
+const githubEnabled =
+  import.meta.env.VITE_APP_GITHUB_ENABLED === 'true' ||
+  !!import.meta.env.VITE_APP_GITHUB_CLIENT_ID;
 const socialProviderFromEnv = import.meta.env.VITE_APP_SOCIAL_PROVIDERS?.split(
   ','
 ).filter(validateSocialProvider);
@@ -48,19 +54,42 @@ const App: React.FC = () => {
   I18n.putVocabularies(translations);
   I18n.setLanguage(i18n.language);
 
-  return (
-    <ErrorBoundary fallback={<ErrorFallback />}>
-      {customProviderEnabled ? (
+  // Determine which auth mode to use
+  const renderAuthContent = () => {
+    // Landing page mode with GitHub support
+    if (landingPageEnabled || githubEnabled) {
+      return (
+        <AuthLanding
+          githubEnabled={githubEnabled}
+          socialProviders={socialProviderFromEnv}
+        >
+          <AppContent />
+        </AuthLanding>
+      );
+    }
+
+    // Custom provider mode (OIDC)
+    if (customProviderEnabled) {
+      return (
         <AuthCustom>
           <AppContent />
         </AuthCustom>
-      ) : (
-        <Authenticator.Provider>
-          <AuthAmplify socialProviders={socialProviderFromEnv}>
-            <AppContent />
-          </AuthAmplify>
-        </Authenticator.Provider>
-      )}
+      );
+    }
+
+    // Default: AWS Amplify Authenticator
+    return (
+      <Authenticator.Provider>
+        <AuthAmplify socialProviders={socialProviderFromEnv}>
+          <AppContent />
+        </AuthAmplify>
+      </Authenticator.Provider>
+    );
+  };
+
+  return (
+    <ErrorBoundary fallback={<ErrorFallback />}>
+      {renderAuthContent()}
     </ErrorBoundary>
   );
 };

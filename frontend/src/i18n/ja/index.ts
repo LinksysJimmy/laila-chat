@@ -6,6 +6,19 @@ const translation: typeof en = {
     signIn: {
       button: {
         login: 'ログイン',
+        cognito: 'メールでサインイン',
+        github: 'GitHubでサインイン',
+        backToLogin: 'ログインに戻る',
+      },
+      welcome: 'ようこそ！続行するにはサインインしてください。',
+      or: 'または',
+      terms: 'サインインすることで、利用規約に同意したことになります。',
+      processing: 'サインイン処理中...',
+      error: {
+        title: '認証エラー',
+        invalidState: '無効なstateパラメータです。もう一度お試しください。',
+        noCode: '認証コードが受信されませんでした。',
+        authFailed: '認証に失敗しました。もう一度お試しください。',
       },
     },
     app: {

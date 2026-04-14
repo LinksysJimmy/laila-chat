@@ -68,6 +68,10 @@ export const identityProvider = (identityProviders: TIdentityProvider[]) => {
           return aws_cognito.UserPoolClientIdentityProvider.custom(
             provider.serviceName! // already validated
           );
+        case "github":
+          // GitHub uses custom OAuth flow handled by our backend
+          // We still include Cognito as the identity provider
+          return aws_cognito.UserPoolClientIdentityProvider.COGNITO;
         default:
           throw new Error(`Invalid identity provider: ${provider.service}`);
       }
@@ -76,7 +80,7 @@ export const identityProvider = (identityProviders: TIdentityProvider[]) => {
 
   const getSocialProviders = () =>
     getProviders()
-      .filter(({ service }) => service !== "oidc")
+      .filter(({ service }) => service !== "oidc" && service !== "github")
       .map(({ service }) => service)
       .join(",");
 
@@ -88,6 +92,12 @@ export const identityProvider = (identityProviders: TIdentityProvider[]) => {
     // Currently only support OIDC provider (SAML not supported)
     getProviders().find(({ service }) => service === "oidc")?.serviceName;
 
+  const checkGitHubProviderEnabled = () =>
+    getProviders().some(({ service }) => service === "github");
+
+  const getGitHubProviderSecretName = () =>
+    getProviders().find(({ service }) => service === "github")?.secretName;
+
   return {
     isExist,
     getProviders,
@@ -95,6 +105,8 @@ export const identityProvider = (identityProviders: TIdentityProvider[]) => {
     getSocialProviders,
     checkCustomProviderEnabled,
     getCustomProviderName,
+    checkGitHubProviderEnabled,
+    getGitHubProviderSecretName,
   };
 };
 
@@ -107,7 +119,7 @@ const validateSocialProvider = (
   | Effect.Effect<never, InvalidSocialProvider, never>
   | Effect.Effect<TIdentityProvider, never, never> => {
   if (
-    !["google", "facebook", "amazon", "apple", "oidc"].includes(
+    !["google", "facebook", "amazon", "apple", "oidc", "github"].includes(
       provider.service
     )
   ) {

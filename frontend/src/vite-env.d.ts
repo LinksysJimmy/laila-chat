@@ -12,6 +12,10 @@ interface ImportMetaEnv {
   readonly VITE_APP_SOCIAL_PROVIDERS: string;
   readonly VITE_APP_CUSTOM_PROVIDER_ENABLED: string;
   readonly VITE_APP_CUSTOM_PROVIDER_NAME: string;
+  readonly VITE_APP_LANDING_PAGE_ENABLED: string;
+  readonly VITE_APP_GITHUB_ENABLED: string;
+  readonly VITE_APP_GITHUB_CLIENT_ID: string;
+  readonly VITE_APP_GITHUB_REDIRECT_URI: string;
 }
 
 interface ImportMeta {

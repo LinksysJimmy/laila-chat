@@ -3,6 +3,19 @@ const translation = {
     signIn: {
       button: {
         login: 'Login',
+        cognito: 'Sign in with Email',
+        github: 'Sign in with GitHub',
+        backToLogin: 'Back to Login',
+      },
+      welcome: 'Welcome! Please sign in to continue.',
+      or: 'or',
+      terms: 'By signing in, you agree to our Terms of Service.',
+      processing: 'Completing sign in...',
+      error: {
+        title: 'Authentication Error',
+        invalidState: 'Invalid state parameter. Please try again.',
+        noCode: 'No authorization code received.',
+        authFailed: 'Authentication failed. Please try again.',
       },
     },
     app: {

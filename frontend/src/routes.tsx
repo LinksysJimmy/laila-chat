@@ -7,6 +7,7 @@ import BotApiSettingsPage from './pages/BotApiSettingsPage.tsx';
 import AdminSharedBotAnalyticsPage from './pages/AdminSharedBotAnalyticsPage.tsx';
 import AdminApiManagementPage from './pages/AdminApiManagementPage.tsx';
 import AdminBotManagementPage from './pages/AdminBotManagementPage.tsx';
+import GitHubCallbackPage from './pages/GitHubCallbackPage.tsx';
 import { useTranslation } from 'react-i18next';
 import {
   createBrowserRouter,
@@ -84,6 +85,11 @@ const rootChildren = [
 ] as const;
 
 const routes = [
+  {
+    // GitHub OAuth callback - must be outside auth wrapper
+    path: '/auth/github/callback',
+    element: <GitHubCallbackPage />,
+  },
   {
     path: '/',
     element: <App />,
