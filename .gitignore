@@ -11,3 +11,10 @@ memory-bank
 .serena
 .claude
 log
+.idea
+
+# Playwright MCP
+.playwright-mcp/
+
+# E2E test screenshots
+e2e-test*.png

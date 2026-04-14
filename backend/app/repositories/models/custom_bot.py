@@ -444,6 +444,7 @@ class BotModel(BaseModel):
     bedrock_guardrails: BedrockGuardrailsModel | None
     active_models: ActiveModelsModel  # type: ignore
     usage_stats: UsageStatsModel
+    backend_type: str = "bedrock"  # "bedrock" (default) | "agentcore"
 
     @staticmethod
     def __is_pinned_format(value: str) -> bool:
@@ -754,6 +755,7 @@ class BotModel(BaseModel):
                 if item.get("UsageStats")
                 else UsageStatsModel(usage_count=0)  # for backward compatibility
             ),
+            backend_type=item.get("BackendType", "bedrock"),
         )
 
     def to_output(self) -> BotOutput:
@@ -827,6 +829,7 @@ class BotModel(BaseModel):
             active_models=ActiveModelsOutput.model_validate(
                 self.active_models.model_dump()  # type: ignore
             ),
+            backend_type=self.backend_type,
         )
 
 
@@ -846,6 +849,7 @@ class BotAliasModel(BaseModel):
     has_agent: bool
     conversation_quick_starters: list[ConversationQuickStarterModel]
     active_models: ActiveModelsModel  # type: ignore
+    backend_type: str = "bedrock"  # "bedrock" (default) | "agentcore"
 
     @classmethod
     def from_bot_for_initial_alias(cls, bot: BotModel) -> Self:
@@ -865,6 +869,7 @@ class BotAliasModel(BaseModel):
             has_agent=bot.is_agent_enabled(),
             conversation_quick_starters=bot.conversation_quick_starters,
             active_models=bot.active_models,
+            backend_type=bot.backend_type,
         )
 
     @classmethod
@@ -888,6 +893,7 @@ class BotAliasModel(BaseModel):
             has_agent=bot.is_agent_enabled(),
             conversation_quick_starters=bot.conversation_quick_starters,
             active_models=bot.active_models,
+            backend_type=bot.backend_type,
         )
 
     @classmethod
@@ -925,6 +931,7 @@ class BotAliasModel(BaseModel):
             has_agent=item.get("HasAgent", False),
             conversation_quick_starters=conversation_quick_starters,
             active_models=active_models,
+            backend_type=item.get("BackendType", "bedrock"),
         )
 
     def to_summary_output(self, bot: BotModel) -> BotSummaryOutput:
@@ -952,6 +959,7 @@ class BotAliasModel(BaseModel):
             active_models=ActiveModelsOutput.model_validate(
                 self.active_models.model_dump()  # type: ignore
             ),
+            backend_type=self.backend_type,
         )
 
 

@@ -1,7 +1,4 @@
-import {
-  Agent,
-  AgentInput,
-} from '../features/agent/types';
+import { Agent, AgentInput } from '../features/agent/types';
 import { BedrockKnowledgeBase } from '../features/knowledgeBase/types';
 import { Model } from './conversation';
 export type BotKind = 'private' | 'mixed';
@@ -102,6 +99,7 @@ export type BotSummary = BotMeta & {
   hasAgent: boolean;
   conversationQuickStarters: ConversationQuickStarter[];
   activeModels: ActiveModels;
+  backendType: 'bedrock' | 'agentcore';
 };
 
 export type BotFile = {

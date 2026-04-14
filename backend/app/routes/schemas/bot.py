@@ -502,6 +502,7 @@ class BotSummaryOutput(BaseSchema):
         description="Shared status of the bot. Possible values: `private`, `shared` and `pinned@xxx",
     )
     active_models: ActiveModelsOutput  # type: ignore
+    backend_type: str = "bedrock"  # "bedrock" | "agentcore"
 
 
 class PrivateVisibilityInput(BaseSchema):
