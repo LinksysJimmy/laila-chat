@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import useAgentCoreApi from './useAgentCoreApi';
+import sendAgentCoreMessage from './useAgentCoreWebSocket';
 
 export interface AgentCoreMessage {
   role: 'user' | 'assistant';
@@ -8,7 +8,6 @@ export interface AgentCoreMessage {
 }
 
 const useAgentCoreChat = () => {
-  const { invoke } = useAgentCoreApi();
   const [messages, setMessages] = useState<AgentCoreMessage[]>([]);
   const [sessionId, setSessionId] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(false);
@@ -27,10 +26,7 @@ const useAgentCoreChat = () => {
       setMessages((prev) => [...prev, userMessage]);
 
       try {
-        const response = await invoke({
-          message: content,
-          session_id: sessionId,
-        });
+        const response = await sendAgentCoreMessage(content, sessionId);
 
         setSessionId(response.session_id);
 
@@ -48,7 +44,7 @@ const useAgentCoreChat = () => {
         setIsLoading(false);
       }
     },
-    [invoke, sessionId]
+    [sessionId]
   );
 
   const resetChat = useCallback(() => {

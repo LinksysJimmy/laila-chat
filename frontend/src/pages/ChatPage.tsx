@@ -364,13 +364,15 @@ const ChatPage: React.FC = () => {
     continueGenerate({ bot: inputBotParams });
   }, [inputBotParams, continueGenerate]);
 
+  const activeMessages = isAgentCoreBot ? agentCoreChat.messages : messages;
+
   useLayoutEffect(() => {
-    if (messages.length > 0) {
+    if (activeMessages.length > 0) {
       scrollToBottom();
     } else {
       scrollToTop();
     }
-  }, [messages, scrollToBottom, scrollToTop]);
+  }, [activeMessages, scrollToBottom, scrollToTop]);
 
   const { updateStarred } = useBot();
   const onClickBotEdit = useCallback(

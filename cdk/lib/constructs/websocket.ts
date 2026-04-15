@@ -83,6 +83,16 @@ export class WebSocket extends Construct {
         resources: [props.auth.userPool.userPoolArn],
       })
     );
+    handlerRole.addToPolicy(
+      new iam.PolicyStatement({
+        actions: ["bedrock-agentcore:InvokeAgentRuntime"],
+        resources: [
+          `arn:aws:bedrock-agentcore:us-west-2:${
+            Stack.of(this).account
+          }:runtime/*`,
+        ],
+      })
+    );
 
     // get api key from secrets manager
     handlerRole.addToPolicy(
@@ -131,6 +141,9 @@ export class WebSocket extends Construct {
         ENABLE_BEDROCK_CROSS_REGION_INFERENCE:
           props.enableBedrockCrossRegionInference.toString(),
         USE_STRANDS: "true",
+        AGENTCORE_RUNTIME_ARN:
+          "arn:aws:bedrock-agentcore:us-west-2:799870512242:runtime/laila_agent_dev-zubMFc4Xdg",
+        AGENTCORE_REGION: "us-west-2",
       },
       role: handlerRole,
       snapStart: props.enableLambdaSnapStart

@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import traceback
+import uuid
 from datetime import datetime
 from decimal import Decimal as decimal
 from queue import SimpleQueue
@@ -17,8 +18,32 @@ from app.stream import OnStopInput, OnThinking
 from app.usecases.chat import chat
 from app.user import User
 from boto3.dynamodb.conditions import Attr, Key
+from botocore.exceptions import ClientError
+from pydantic import BaseModel, ConfigDict
 
 WEBSOCKET_SESSION_TABLE_NAME = os.environ["WEBSOCKET_SESSION_TABLE_NAME"]
+AGENT_RUNTIME_ARN = os.environ.get("AGENTCORE_RUNTIME_ARN", "")
+AGENTCORE_REGION = os.environ.get("AGENTCORE_REGION", "us-west-2")
+
+
+class AgentCoreWsRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    action: Literal["agentcore"]
+    message: str
+    session_id: str | None = None
+
+
+_agentcore_client = None
+
+
+def _get_agentcore_client():
+    global _agentcore_client
+    if _agentcore_client is None:
+        _agentcore_client = boto3.client(
+            "bedrock-agentcore", region_name=AGENTCORE_REGION
+        )
+    return _agentcore_client
 
 dynamodb_client = boto3.resource("dynamodb")
 table = dynamodb_client.Table(WEBSOCKET_SESSION_TABLE_NAME)
@@ -253,6 +278,65 @@ def process_chat_input(
         }
 
 
+def process_agentcore_request(
+    user_id: str,
+    request: AgentCoreWsRequest,
+    notificator: NotificationSender,
+) -> dict:
+    """Invoke AgentCore and send the response back over WebSocket."""
+    session_id = request.session_id or f"{uuid.uuid4()}-{user_id[:8]}"
+
+    try:
+        client = _get_agentcore_client()
+        response = client.invoke_agent_runtime(
+            agentRuntimeArn=AGENT_RUNTIME_ARN,
+            runtimeSessionId=session_id,
+            payload=json.dumps({"prompt": request.message}).encode("utf-8"),
+            contentType="application/json",
+        )
+
+        response_body = response["response"].read().decode("utf-8")
+        parsed = json.loads(response_body)
+
+        notificator.notify(
+            json.dumps(
+                {
+                    "status": "AGENTCORE_RESPONSE",
+                    "response": parsed.get("response", ""),
+                    "session_id": response.get("runtimeSessionId", session_id),
+                }
+            ).encode("utf-8")
+        )
+        return {"statusCode": 200, "body": "AgentCore response sent."}
+
+    except ClientError as e:
+        error_code = e.response["Error"]["Code"]
+        logger.error(
+            "AgentCore invocation failed",
+            extra={
+                "user_id": user_id,
+                "session_id": session_id,
+                "error_code": error_code,
+            },
+        )
+        if error_code in ("ThrottlingException", "ServiceQuotaExceededException"):
+            reason = "Agent is busy, try again later."
+        elif error_code == "AccessDeniedException":
+            reason = "Not authorized to invoke agent."
+        else:
+            reason = f"Agent runtime error: {error_code}"
+
+        notificator.notify(
+            json.dumps(
+                {
+                    "status": "ERROR",
+                    "reason": reason,
+                }
+            ).encode("utf-8")
+        )
+        return {"statusCode": 500, "body": reason}
+
+
 def handler(event, context):
     logger.info(f"Received event: {event}")
     route_key = event["requestContext"]["routeKey"]
@@ -363,7 +447,16 @@ def handler(event, context):
             full_message = "".join(item["MessagePart"] for item in message_parts)
 
             # Process the concatenated full message
-            chat_input = ChatInput(**json.loads(full_message))
+            parsed_message = json.loads(full_message)
+
+            if parsed_message.get("action") == "agentcore":
+                return process_agentcore_request(
+                    user_id=user_id,
+                    request=AgentCoreWsRequest(**parsed_message),
+                    notificator=notificator,
+                )
+
+            chat_input = ChatInput(**parsed_message)
             return process_chat_input(
                 user=user,
                 chat_input=chat_input,
