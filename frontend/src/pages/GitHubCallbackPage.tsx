@@ -22,6 +22,7 @@ const GitHubCallbackPage: React.FC = () => {
 
   useEffect(() => {
     const handleCallback = async () => {
+      console.log('[GitHubCallback] Starting callback handler');
       const code = searchParams.get('code');
       const state = searchParams.get('state');
       const errorParam = searchParams.get('error');
@@ -29,25 +30,29 @@ const GitHubCallbackPage: React.FC = () => {
 
       // Check for OAuth errors
       if (errorParam) {
+        console.error('[GitHubCallback] OAuth error:', errorParam, errorDescription);
         setError(errorDescription || errorParam);
-                return;
+        return;
       }
 
       // Validate state to prevent CSRF
       const savedState = sessionStorage.getItem('github_oauth_state');
+      console.log('[GitHubCallback] State validation:', { state, savedState, match: state === savedState });
       if (!state || state !== savedState) {
         setError(t('signIn.error.invalidState', 'Invalid state parameter. Please try again.'));
-                return;
+        return;
       }
 
       if (!code) {
+        console.error('[GitHubCallback] No code received');
         setError(t('signIn.error.noCode', 'No authorization code received.'));
-                return;
+        return;
       }
 
       try {
         // Exchange code for tokens via our backend
         const redirectUri = `${window.location.origin}/auth/github/callback`;
+        console.log('[GitHubCallback] Exchanging code for tokens...');
 
         const response = await axios.post<GitHubAuthResponse>(
           `${API_ENDPOINT}/auth/github/callback`,
@@ -57,34 +62,36 @@ const GitHubCallbackPage: React.FC = () => {
           }
         );
 
+        console.log('[GitHubCallback] Token response received:', response.status);
         const tokens = response.data;
 
         // Store tokens for the session
-        // Note: In a production app, you'd want to handle this more securely
         localStorage.setItem('github_tokens', JSON.stringify({
           idToken: tokens.id_token,
           accessToken: tokens.access_token,
           refreshToken: tokens.refresh_token,
           expiresAt: Date.now() + tokens.expires_in * 1000,
         }));
+        console.log('[GitHubCallback] Tokens stored in localStorage');
 
         // Clean up state
         sessionStorage.removeItem('github_oauth_state');
 
-        // Redirect to home page
-        navigate('/', { replace: true });
+        // Redirect to home page using window.location as fallback
+        console.log('[GitHubCallback] Redirecting to home...');
+        window.location.href = '/';
       } catch (err) {
-        console.error('GitHub auth error:', err);
+        console.error('[GitHubCallback] Auth error:', err);
         if (axios.isAxiosError(err) && err.response?.data?.detail) {
           setError(err.response.data.detail);
         } else {
           setError(t('signIn.error.authFailed', 'Authentication failed. Please try again.'));
         }
-              }
+      }
     };
 
     handleCallback();
-  }, [searchParams, navigate, t]);
+  }, [searchParams, t]);
 
   if (error) {
     return (

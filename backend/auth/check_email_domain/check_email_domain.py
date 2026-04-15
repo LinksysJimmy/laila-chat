@@ -33,6 +33,13 @@ def handler(event: Dict, context: Dict) -> Dict:
     """
     try:
         print("Received event:", json.dumps(event, indent=2))
+
+        # Bypass domain check for admin-created users and external providers (e.g., GitHub OAuth)
+        trigger_source = event.get("triggerSource", "")
+        if trigger_source in ["PreSignUp_AdminCreateUser", "PreSignUp_ExternalProvider"]:
+            print(f"Bypassing domain check for trigger: {trigger_source}")
+            return event
+
         email = event["request"]["userAttributes"]["email"]
         is_allowed = check_email_domain(email)
         if is_allowed:

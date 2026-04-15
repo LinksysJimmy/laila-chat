@@ -142,22 +142,47 @@ def get_github_user_email(access_token: str) -> Optional[str]:
     return None
 
 
-def create_or_get_cognito_user(github_user: dict, email: str) -> str:
-    """Create or get a Cognito user for the GitHub user."""
+def generate_user_password(github_id: str) -> str:
+    """Generate a deterministic password for a GitHub user."""
+    # Use GitHub client secret as the key for HMAC
+    _, client_secret = get_github_secrets()
+    secret_key = client_secret or "default_secret_key_for_github_auth"
+
+    message = f"github_user_{github_id}"
+    password_hash = hmac.new(
+        secret_key.encode("utf-8"),
+        msg=message.encode("utf-8"),
+        digestmod=hashlib.sha256,
+    ).hexdigest()
+
+    # Make it a valid password: add special chars and uppercase
+    return f"Gh!{password_hash[:30]}"
+
+
+def create_or_get_cognito_user(github_user: dict, email: str) -> tuple[str, str]:
+    """Create or get a Cognito user for the GitHub user. Returns (username, password)."""
     cognito = boto3.client("cognito-idp", region_name=REGION)
 
-    # Use GitHub ID as the username prefix to ensure uniqueness
+    # Use email as username (required by Cognito User Pool configuration)
     github_id = str(github_user.get("id"))
-    username = f"github_{github_id}"
+    username = email
+    password = generate_user_password(github_id)
 
     try:
         # Check if user exists
         cognito.admin_get_user(UserPoolId=USER_POOL_ID, Username=username)
         logger.info(f"Found existing Cognito user: {username}")
+        # Update password to ensure it matches our deterministic password
+        cognito.admin_set_user_password(
+            UserPoolId=USER_POOL_ID,
+            Username=username,
+            Password=password,
+            Permanent=True,
+        )
+        logger.info(f"Updated password for existing user: {username}")
     except cognito.exceptions.UserNotFoundException:
         # Create new user
         logger.info(f"Creating new Cognito user: {username}")
-        temp_password = secrets.token_urlsafe(32)
 
         cognito.admin_create_user(
             UserPoolId=USER_POOL_ID,
@@ -165,39 +190,35 @@ def create_or_get_cognito_user(github_user: dict, email: str) -> str:
             UserAttributes=[
                 {"Name": "email", "Value": email},
                 {"Name": "email_verified", "Value": "true"},
-                {"Name": "custom:github_id", "Value": github_id},
-                {
-                    "Name": "custom:github_login",
-                    "Value": github_user.get("login", ""),
-                },
             ],
             MessageAction="SUPPRESS",  # Don't send welcome email
-            TemporaryPassword=temp_password,
+            TemporaryPassword=password,
         )
 
         # Set permanent password to allow programmatic auth
         cognito.admin_set_user_password(
             UserPoolId=USER_POOL_ID,
             Username=username,
-            Password=temp_password,
+            Password=password,
             Permanent=True,
         )
 
-    return username
+    return username, password
 
 
-def authenticate_cognito_user(username: str) -> dict:
+def authenticate_cognito_user(username: str, password: str) -> dict:
     """Authenticate a Cognito user and get tokens using admin auth."""
-    cognito = boto3.client("cognito-idp", region_name=REGION)
+    import base64
 
-    # Use admin-initiated auth flow
-    # This requires the app client to have ALLOW_ADMIN_USER_PASSWORD_AUTH enabled
-    # We use a custom auth flow that doesn't require the password
+    cognito = boto3.client("cognito-idp", region_name=REGION)
 
     # Generate a secret hash if client secret is configured
     client_secret = os.environ.get("CLIENT_SECRET", "")
 
-    auth_params = {"USERNAME": username}
+    auth_params = {
+        "USERNAME": username,
+        "PASSWORD": password,
+    }
 
     if client_secret:
         message = username + CLIENT_ID
@@ -206,39 +227,16 @@ def authenticate_cognito_user(username: str) -> dict:
             msg=message.encode("utf-8"),
             digestmod=hashlib.sha256,
         ).digest()
-        import base64
-
         auth_params["SECRET_HASH"] = base64.b64encode(dig).decode()
 
     try:
-        # Use custom auth flow for passwordless authentication
+        # Use ADMIN_USER_PASSWORD_AUTH flow
         response = cognito.admin_initiate_auth(
             UserPoolId=USER_POOL_ID,
             ClientId=CLIENT_ID,
-            AuthFlow="CUSTOM_AUTH",
+            AuthFlow="ADMIN_USER_PASSWORD_AUTH",
             AuthParameters=auth_params,
         )
-
-        # If custom auth is not set up, we need an alternative approach
-        # For now, we'll use admin_initiate_auth with a challenge response
-        if "ChallengeName" in response:
-            # Handle challenge if needed
-            challenge_name = response["ChallengeName"]
-            session = response["Session"]
-
-            if challenge_name == "CUSTOM_CHALLENGE":
-                # Respond to custom challenge
-                response = cognito.admin_respond_to_auth_challenge(
-                    UserPoolId=USER_POOL_ID,
-                    ClientId=CLIENT_ID,
-                    ChallengeName=challenge_name,
-                    ChallengeResponses={
-                        "USERNAME": username,
-                        "ANSWER": "github_verified",
-                        **({"SECRET_HASH": auth_params["SECRET_HASH"]} if client_secret else {}),
-                    },
-                    Session=session,
-                )
 
         return response.get("AuthenticationResult", {})
 
@@ -247,35 +245,7 @@ def authenticate_cognito_user(username: str) -> dict:
         raise HTTPException(status_code=401, detail="Authentication failed")
     except Exception as e:
         logger.error(f"Cognito auth error: {e}")
-        # Fallback: Generate tokens using admin APIs
-        # This is a workaround when custom auth flow is not configured
-        return generate_tokens_admin(cognito, username)
-
-
-def generate_tokens_admin(cognito, username: str) -> dict:
-    """Generate tokens for a user using admin APIs as a fallback."""
-    # This is a simplified approach - in production, you'd want proper custom auth
-    # For now, we'll return a structure that the frontend can use
-
-    # Get user info
-    user = cognito.admin_get_user(UserPoolId=USER_POOL_ID, Username=username)
-
-    # Create a simple token structure
-    # Note: This is a workaround. Proper implementation requires custom auth Lambda triggers
-    import time
-    import uuid
-
-    # Generate a pseudo-token for the session
-    # In production, configure proper Cognito custom auth flow
-    session_id = str(uuid.uuid4())
-
-    return {
-        "IdToken": f"github_session_{session_id}",
-        "AccessToken": f"github_access_{session_id}",
-        "RefreshToken": f"github_refresh_{session_id}",
-        "ExpiresIn": 3600,
-        "TokenType": "Bearer",
-    }
+        raise HTTPException(status_code=500, detail=f"Authentication error: {str(e)}")
 
 
 @router.get("/auth/github/config", response_model=GitHubConfigResponse)
@@ -316,10 +286,10 @@ def github_callback(request: GitHubAuthRequest):
         )
 
     # Create or get Cognito user
-    username = create_or_get_cognito_user(github_user, email)
+    username, password = create_or_get_cognito_user(github_user, email)
 
     # Authenticate and get Cognito tokens
-    cognito_tokens = authenticate_cognito_user(username)
+    cognito_tokens = authenticate_cognito_user(username, password)
 
     return GitHubAuthResponse(
         id_token=cognito_tokens.get("IdToken", ""),

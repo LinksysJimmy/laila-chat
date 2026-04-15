@@ -349,6 +349,18 @@ export class Api extends Construct {
         userPoolClients: [props.auth.client],
       }
     );
+    // Add GitHub auth routes WITHOUT authorizer (must be added before catch-all route)
+    // These routes need to be accessible without authentication for OAuth flow
+    api.addRoutes({
+      path: "/auth/github/{proxy+}",
+      integration,
+      methods: [
+        HttpMethod.GET,
+        HttpMethod.POST,
+      ],
+      // No authorizer - allows unauthenticated access for OAuth callback
+    });
+
     let routeProps: any = {
       path: "/{proxy+}",
       integration,

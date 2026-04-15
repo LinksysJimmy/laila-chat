@@ -1,45 +1,80 @@
 import React, { ReactNode, useState, useEffect, cloneElement, ReactElement } from 'react';
 import { BaseProps } from '../@types/common';
-import { getCurrentUser, signInWithRedirect, signOut } from 'aws-amplify/auth';
+import { getCurrentUser, signOut } from 'aws-amplify/auth';
 import { useTranslation } from 'react-i18next';
-import { PiCircleNotch, PiGithubLogo, PiUser } from 'react-icons/pi';
+import { PiCircleNotch, PiGithubLogo, PiUser, PiArrowLeft } from 'react-icons/pi';
+import { Authenticator } from '@aws-amplify/ui-react';
 import Button from './Button';
+import { SocialProvider } from '../@types/auth';
 
 type Props = BaseProps & {
   children: ReactNode;
   githubEnabled?: boolean;
-  socialProviders?: string[];
+  socialProviders?: SocialProvider[];
 };
 
 const GITHUB_CLIENT_ID = import.meta.env.VITE_APP_GITHUB_CLIENT_ID || '';
 const GITHUB_REDIRECT_URI = import.meta.env.VITE_APP_GITHUB_REDIRECT_URI || `${window.location.origin}/auth/github/callback`;
 
+// Helper to check if GitHub tokens are valid
+const getGitHubTokens = () => {
+  try {
+    const stored = localStorage.getItem('github_tokens');
+    if (!stored) return null;
+    const tokens = JSON.parse(stored);
+    // Check if tokens exist and aren't expired
+    if (tokens.idToken && tokens.expiresAt > Date.now()) {
+      return tokens;
+    }
+    // Clear expired tokens
+    localStorage.removeItem('github_tokens');
+    return null;
+  } catch {
+    return null;
+  }
+};
+
 const AuthLanding: React.FC<Props> = ({ children, githubEnabled = false, socialProviders = [] }) => {
   const [authenticated, setAuthenticated] = useState(false);
+  const [, setAuthMethod] = useState<'cognito' | 'github' | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showCognitoLogin, setShowCognitoLogin] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
-    getCurrentUser()
-      .then(() => {
+    const checkAuth = async () => {
+      // First check for GitHub tokens
+      const githubTokens = getGitHubTokens();
+      if (githubTokens) {
         setAuthenticated(true);
-      })
-      .catch(() => {
-        setAuthenticated(false);
-      })
-      .finally(() => {
+        setAuthMethod('github');
         setLoading(false);
-      });
+        return;
+      }
+
+      // Then check Cognito
+      try {
+        await getCurrentUser();
+        setAuthenticated(true);
+        setAuthMethod('cognito');
+      } catch {
+        setAuthenticated(false);
+        setAuthMethod(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
   const handleCognitoSignIn = () => {
-    // If there are social providers configured, use Amplify's hosted UI
-    if (socialProviders.length > 0) {
-      signInWithRedirect();
-    } else {
-      // Otherwise, redirect to the standard Cognito login
-      signInWithRedirect();
-    }
+    // Show the Cognito login form
+    setShowCognitoLogin(true);
+  };
+
+  const handleBackToLanding = () => {
+    setShowCognitoLogin(false);
   };
 
   const handleGitHubSignIn = () => {
@@ -56,11 +91,17 @@ const AuthLanding: React.FC<Props> = ({ children, githubEnabled = false, socialP
     window.location.href = githubAuthUrl.toString();
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     // Clear any GitHub session data
     sessionStorage.removeItem('github_oauth_state');
     localStorage.removeItem('github_tokens');
-    signOut();
+    try {
+      await signOut();
+    } catch {
+      // Ignore signOut errors for GitHub users
+    }
+    // Force page reload to show login page
+    window.location.href = '/';
   };
 
   const generateState = () => {
@@ -80,6 +121,40 @@ const AuthLanding: React.FC<Props> = ({ children, githubEnabled = false, socialP
         </div>
         <div className="animate-spin text-aws-sea-blue-light">
           <PiCircleNotch size={60} />
+        </div>
+      </div>
+    );
+  }
+
+  // Show Cognito login form
+  if (!authenticated && showCognitoLogin) {
+    return (
+      <div className="flex min-h-screen flex-col bg-aws-paper-light dark:bg-aws-squid-ink-dark">
+        <div className="p-4">
+          <button
+            onClick={handleBackToLanding}
+            className="flex items-center gap-2 text-aws-font-color-light hover:text-aws-sea-blue-light dark:text-aws-font-color-gray dark:hover:text-aws-sea-blue-dark"
+          >
+            <PiArrowLeft size={20} />
+            {t('signIn.button.backToLogin', 'Back to login options')}
+          </button>
+        </div>
+        <div className="flex flex-1 items-center justify-center">
+          <Authenticator
+            socialProviders={socialProviders}
+            components={{
+              Header: () => (
+                <div className="mb-5 mt-10 flex justify-center text-3xl text-aws-font-color-light">
+                  {t('app.name')}
+                </div>
+              ),
+            }}
+          >
+            {({ signOut: amplifySignOut }) => {
+              // User authenticated via Cognito - render the app
+              return <>{cloneElement(children as ReactElement, { signOut: amplifySignOut })}</>;
+            }}
+          </Authenticator>
         </div>
       </div>
     );
