@@ -105,6 +105,11 @@ class AgentCoreConfig(BaseSchema):
     agent_runtime_id: str
 
 
+class LambdaConfig(BaseSchema):
+    function_name: str
+    region: str = "us-east-1"
+
+
 class PlainTool(BaseSchema):
     tool_type: Literal["plain"] = "plain"
     name: str
@@ -147,8 +152,15 @@ class AgentCoreTool(BaseSchema):
     agentCoreConfig: Optional[AgentCoreConfig] | None = None
 
 
+class LambdaTool(BaseSchema):
+    tool_type: Literal["lambda"]
+    name: str
+    description: str
+    lambdaConfig: Optional[LambdaConfig] | None = None
+
+
 Tool = Annotated[
-    PlainTool | InternetTool | BedrockAgentTool | AgentCoreTool, Discriminator("tool_type")
+    PlainTool | InternetTool | BedrockAgentTool | AgentCoreTool | LambdaTool, Discriminator("tool_type")
 ]
 
 

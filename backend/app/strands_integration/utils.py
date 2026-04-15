@@ -26,12 +26,18 @@ def get_strands_registered_tools(bot: BotModel | None = None) -> list[StrandsAge
     from app.strands_integration.tools.internet_search import (
         create_internet_search_tool,
     )
+    from app.strands_integration.tools.lambda_runner import (
+        create_jenkins_runner_tool,
+        create_lambda_runner_tool,
+    )
     from app.strands_integration.tools.simple_list import simple_list, structured_list
 
     tools: list[StrandsAgentTool] = []
     tools.append(create_internet_search_tool(bot))
     tools.append(create_bedrock_agent_tool(bot))
     tools.append(create_agentcore_tool(bot))
+    tools.append(create_jenkins_runner_tool(bot))
+    tools.append(create_lambda_runner_tool(bot))
     # tools.append(create_calculator_tool(bot))  # For testing purposes
     return tools
 

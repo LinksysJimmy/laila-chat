@@ -24,6 +24,8 @@ from app.routes.schemas.bot import (
     GenerationParams,
     InternetTool,
     Knowledge,
+    LambdaConfig,
+    LambdaTool,
     PlainTool,
     ReasoningParams,
     Tool,
@@ -283,8 +285,43 @@ class AgentCoreToolModel(BaseModel):
         )
 
 
+class LambdaConfigModel(BaseModel):
+    function_name: str
+    region: str = "us-east-1"
+
+
+class LambdaToolModel(BaseModel):
+    tool_type: Literal["lambda"] = Field(
+        "lambda",
+        description="Type of tool. It does need additional settings for the lambda function.",
+    )
+    name: str
+    description: str
+    lambdaConfig: Optional[LambdaConfigModel] | None = None
+
+    @classmethod
+    def from_tool_input(cls, tool) -> Self:
+        from app.routes.schemas.bot import LambdaTool
+
+        if not isinstance(tool, LambdaTool):
+            raise ValueError(f"Expected LambdaTool, got {type(tool)}")
+        return cls(
+            tool_type="lambda",
+            name=tool.name,
+            description=tool.description,
+            lambdaConfig=(
+                LambdaConfigModel(
+                    function_name=tool.lambdaConfig.function_name,
+                    region=tool.lambdaConfig.region,
+                )
+                if tool.lambdaConfig
+                else None
+            ),
+        )
+
+
 ToolModel = Annotated[
-    PlainToolModel | InternetToolModel | BedrockAgentToolModel | AgentCoreToolModel,
+    PlainToolModel | InternetToolModel | BedrockAgentToolModel | AgentCoreToolModel | LambdaToolModel,
     Discriminator("tool_type"),
 ]
 
@@ -326,6 +363,8 @@ class AgentModel(BaseModel):
                 tools.append(BedrockAgentToolModel.from_tool_input(tool_input))
             elif tool_input.tool_type == "agentcore":
                 tools.append(AgentCoreToolModel.from_tool_input(tool_input))
+            elif tool_input.tool_type == "lambda":
+                tools.append(LambdaToolModel.from_tool_input(tool_input))
 
         return cls(tools=tools)
 
@@ -375,6 +414,19 @@ class AgentModel(BaseModel):
                         agentCoreConfig=(
                             AgentCoreConfig(**tool.agentCoreConfig.model_dump())
                             if tool.agentCoreConfig
+                            else None
+                        ),
+                    )
+                )
+            elif isinstance(tool, LambdaToolModel):
+                tools.append(
+                    LambdaTool(
+                        tool_type="lambda",
+                        name=tool.name,
+                        description=tool.description,
+                        lambdaConfig=(
+                            LambdaConfig(**tool.lambdaConfig.model_dump())
+                            if tool.lambdaConfig
                             else None
                         ),
                     )
