@@ -110,7 +110,7 @@ def create_jenkins_runner_tool(bot: BotModel | None = None):
         Args:
             action: The action to perform (restart, deploy, stop, start, status)
             environment: The environment name (QA, staging, production, dev)
-            target: The target system or service name (e.g., cloud1, cloud2, api-server, web-app)
+            target: The target system or service name (e.g., cloud1, cloud2, tomcat, api-server, web-app)
 
         Returns:
             str: Result of the Jenkins job execution

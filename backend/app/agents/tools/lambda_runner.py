@@ -33,7 +33,7 @@ class JenkinsRunnerInput(BaseModel):
         description="The environment name (QA, staging, production, dev)"
     )
     target: str = Field(
-        description="The target system or service name (e.g., cloud1, cloud2, api-server, web-app)"
+        description="The target system or service name (e.g., cloud1, cloud2, tomcat, api-server, web-app)"
     )
 
 
@@ -196,7 +196,7 @@ jenkins_runner_tool = AgentTool(
     description=(
         "Execute Jenkins jobs to manage cloud environments and infrastructure. "
         "Use this tool when user wants to restart, deploy, stop, start, or check status of cloud services. "
-        "Examples: 'restart QA cloud1', 'deploy to staging', 'check status of production api-server'"
+        "Examples: 'restart QA cloud1', 'restart QA tomcat', 'deploy to staging', 'check status of production api-server'"
     ),
     args_schema=JenkinsRunnerInput,
     function=_jenkins_runner_function,
