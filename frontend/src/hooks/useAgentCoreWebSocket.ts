@@ -4,6 +4,34 @@ import { PostStreamingStatus } from '../constants';
 const WS_ENDPOINT: string = import.meta.env.VITE_APP_WS_ENDPOINT;
 const CHUNK_SIZE = 32 * 1024; // 32KB
 
+// Helper to get GitHub tokens from localStorage
+const getGitHubToken = (): string | null => {
+  try {
+    const stored = localStorage.getItem('github_tokens');
+    if (stored) {
+      const tokens = JSON.parse(stored);
+      return tokens.idToken || null;
+    }
+  } catch {
+    // Ignore parse errors
+  }
+  return null;
+};
+
+// Get token from Amplify or GitHub OAuth
+const getAuthToken = async (): Promise<string | undefined> => {
+  try {
+    const session = await fetchAuthSession();
+    const token = session.tokens?.idToken?.toString();
+    if (token) return token;
+  } catch {
+    // Cognito auth failed, try GitHub token
+  }
+  // Fallback to GitHub token
+  const githubToken = getGitHubToken();
+  return githubToken || undefined;
+};
+
 export interface AgentCoreWsResponse {
   response: string;
   session_id: string;
@@ -16,7 +44,7 @@ const sendAgentCoreMessage = (
   return new Promise(async (resolve, reject) => {
     let responseReceived = false;
 
-    const token = (await fetchAuthSession()).tokens?.idToken?.toString();
+    const token = await getAuthToken();
     if (!token) {
       reject(new Error('Not authenticated'));
       return;
