@@ -6,6 +6,7 @@ import { PiCircleNotch, PiGithubLogo, PiUser, PiArrowLeft } from 'react-icons/pi
 import { Authenticator } from '@aws-amplify/ui-react';
 import Button from './Button';
 import { SocialProvider } from '../@types/auth';
+import { getGitHubToken, clearGitHubTokens, isGitHubLoggedIn } from '../utils/githubToken';
 
 type Props = BaseProps & {
   children: ReactNode;
@@ -16,24 +17,6 @@ type Props = BaseProps & {
 const GITHUB_CLIENT_ID = import.meta.env.VITE_APP_GITHUB_CLIENT_ID || '';
 const GITHUB_REDIRECT_URI = import.meta.env.VITE_APP_GITHUB_REDIRECT_URI || `${window.location.origin}/auth/github/callback`;
 
-// Helper to check if GitHub tokens are valid
-const getGitHubTokens = () => {
-  try {
-    const stored = localStorage.getItem('github_tokens');
-    if (!stored) return null;
-    const tokens = JSON.parse(stored);
-    // Check if tokens exist and aren't expired
-    if (tokens.idToken && tokens.expiresAt > Date.now()) {
-      return tokens;
-    }
-    // Clear expired tokens
-    localStorage.removeItem('github_tokens');
-    return null;
-  } catch {
-    return null;
-  }
-};
-
 const AuthLanding: React.FC<Props> = ({ children, githubEnabled = false, socialProviders = [] }) => {
   const [authenticated, setAuthenticated] = useState(false);
   const [, setAuthMethod] = useState<'cognito' | 'github' | null>(null);
@@ -43,13 +26,15 @@ const AuthLanding: React.FC<Props> = ({ children, githubEnabled = false, socialP
 
   useEffect(() => {
     const checkAuth = async () => {
-      // First check for GitHub tokens
-      const githubTokens = getGitHubTokens();
-      if (githubTokens) {
-        setAuthenticated(true);
-        setAuthMethod('github');
-        setLoading(false);
-        return;
+      // First check for GitHub tokens (will auto-refresh if needed)
+      if (isGitHubLoggedIn()) {
+        const token = await getGitHubToken();
+        if (token) {
+          setAuthenticated(true);
+          setAuthMethod('github');
+          setLoading(false);
+          return;
+        }
       }
 
       // Then check Cognito
@@ -94,7 +79,7 @@ const AuthLanding: React.FC<Props> = ({ children, githubEnabled = false, socialP
   const handleSignOut = async () => {
     // Clear any GitHub session data
     sessionStorage.removeItem('github_oauth_state');
-    localStorage.removeItem('github_tokens');
+    clearGitHubTokens();
     try {
       await signOut();
     } catch {

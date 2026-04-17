@@ -4,24 +4,10 @@ import { create } from 'zustand';
 import i18next from 'i18next';
 import { StreamingEvent } from './xstates/streaming';
 import { PostStreamingStatus } from '../constants';
+import { getGitHubToken } from '../utils/githubToken';
 
 const WS_ENDPOINT: string = import.meta.env.VITE_APP_WS_ENDPOINT;
 const CHUNK_SIZE = 32 * 1024; //32KB
-
-// Helper to get GitHub tokens from localStorage
-const getGitHubToken = (): string | null => {
-  try {
-    const stored = localStorage.getItem('github_tokens');
-    if (!stored) return null;
-    const tokens = JSON.parse(stored);
-    if (tokens.idToken && tokens.expiresAt > Date.now()) {
-      return tokens.idToken;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-};
 
 // Get auth token from Cognito or GitHub
 const getAuthToken = async (): Promise<string | undefined> => {
@@ -36,8 +22,8 @@ const getAuthToken = async (): Promise<string | undefined> => {
     // Cognito auth failed, try GitHub
   }
 
-  // Fallback to GitHub token
-  const githubToken = getGitHubToken();
+  // Fallback to GitHub token (with auto-refresh)
+  const githubToken = await getGitHubToken();
   return githubToken || undefined;
 };
 

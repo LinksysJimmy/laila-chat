@@ -35,6 +35,17 @@ class GitHubAuthResponse(BaseModel):
     token_type: str
 
 
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
+
+
+class RefreshTokenResponse(BaseModel):
+    id_token: str
+    access_token: str
+    expires_in: int
+    token_type: str
+
+
 class GitHubConfigResponse(BaseModel):
     client_id: str
     enabled: bool
@@ -246,6 +257,57 @@ def authenticate_cognito_user(username: str, password: str) -> dict:
     except Exception as e:
         logger.error(f"Cognito auth error: {e}")
         raise HTTPException(status_code=500, detail=f"Authentication error: {str(e)}")
+
+
+def refresh_cognito_token(refresh_token: str) -> dict:
+    """Refresh Cognito tokens using refresh token."""
+    import base64
+
+    cognito = boto3.client("cognito-idp", region_name=REGION)
+
+    auth_params = {
+        "REFRESH_TOKEN": refresh_token,
+    }
+
+    # Add secret hash if client secret is configured
+    client_secret = os.environ.get("CLIENT_SECRET", "")
+    if client_secret:
+        # For refresh token, we need to use a dummy username since we don't have it
+        # However, Cognito refresh flow doesn't require SECRET_HASH when using REFRESH_TOKEN
+        pass
+
+    try:
+        # Use REFRESH_TOKEN_AUTH flow
+        response = cognito.admin_initiate_auth(
+            UserPoolId=USER_POOL_ID,
+            ClientId=CLIENT_ID,
+            AuthFlow="REFRESH_TOKEN_AUTH",
+            AuthParameters=auth_params,
+        )
+
+        return response.get("AuthenticationResult", {})
+
+    except cognito.exceptions.NotAuthorizedException as e:
+        logger.error(f"Cognito refresh failed (NotAuthorized): {e}")
+        raise HTTPException(status_code=401, detail="Refresh token expired or invalid")
+    except Exception as e:
+        logger.error(f"Cognito refresh error: {e}")
+        raise HTTPException(status_code=500, detail=f"Token refresh error: {str(e)}")
+
+
+@router.post("/auth/github/refresh", response_model=RefreshTokenResponse)
+def refresh_token(request: RefreshTokenRequest):
+    """
+    Refresh expired tokens using the refresh token.
+    """
+    tokens = refresh_cognito_token(request.refresh_token)
+
+    return RefreshTokenResponse(
+        id_token=tokens.get("IdToken", ""),
+        access_token=tokens.get("AccessToken", ""),
+        expires_in=tokens.get("ExpiresIn", 3600),
+        token_type=tokens.get("TokenType", "Bearer"),
+    )
 
 
 @router.get("/auth/github/config", response_model=GitHubConfigResponse)

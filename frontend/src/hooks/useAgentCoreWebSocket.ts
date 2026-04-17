@@ -1,22 +1,9 @@
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { PostStreamingStatus } from '../constants';
+import { getGitHubToken } from '../utils/githubToken';
 
 const WS_ENDPOINT: string = import.meta.env.VITE_APP_WS_ENDPOINT;
 const CHUNK_SIZE = 32 * 1024; // 32KB
-
-// Helper to get GitHub tokens from localStorage
-const getGitHubToken = (): string | null => {
-  try {
-    const stored = localStorage.getItem('github_tokens');
-    if (stored) {
-      const tokens = JSON.parse(stored);
-      return tokens.idToken || null;
-    }
-  } catch {
-    // Ignore parse errors
-  }
-  return null;
-};
 
 // Get token from Amplify or GitHub OAuth
 const getAuthToken = async (): Promise<string | undefined> => {
@@ -27,8 +14,8 @@ const getAuthToken = async (): Promise<string | undefined> => {
   } catch {
     // Cognito auth failed, try GitHub token
   }
-  // Fallback to GitHub token
-  const githubToken = getGitHubToken();
+  // Fallback to GitHub token (with auto-refresh)
+  const githubToken = await getGitHubToken();
   return githubToken || undefined;
 };
 

@@ -1,26 +1,12 @@
 import { fetchAuthSession } from 'aws-amplify/auth';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import useSWR, { SWRConfiguration } from 'swr';
+import { getGitHubToken } from '../utils/githubToken';
 // import useAlertSnackbar from "./useAlertSnackbar";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_APP_API_ENDPOINT,
 });
-
-// Helper to get GitHub tokens from localStorage
-const getGitHubToken = (): string | null => {
-  try {
-    const stored = localStorage.getItem('github_tokens');
-    if (!stored) return null;
-    const tokens = JSON.parse(stored);
-    if (tokens.idToken && tokens.expiresAt > Date.now()) {
-      return tokens.idToken;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-};
 
 // HTTP Request Preprocessing
 api.interceptors.request.use(async (config) => {
@@ -36,8 +22,8 @@ api.interceptors.request.use(async (config) => {
     // Cognito auth failed, try GitHub token
   }
 
-  // Fallback to GitHub token
-  const githubToken = getGitHubToken();
+  // Fallback to GitHub token (now async to support refresh)
+  const githubToken = await getGitHubToken();
   if (githubToken) {
     config.headers['Authorization'] = 'Bearer ' + githubToken;
   }
