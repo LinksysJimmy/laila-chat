@@ -20,7 +20,6 @@ logger.setLevel(logging.INFO)
 # Configuration
 REDSHIFT_SECRET_NAME = os.environ.get("REDSHIFT_SECRET_NAME", "prod/redshift/cret")
 REDSHIFT_SECRET_REGION = os.environ.get("REDSHIFT_SECRET_REGION", "us-east-1")
-REDSHIFT_DATABASE = os.environ.get("REDSHIFT_DATABASE", "dev")
 REDSHIFT_PORT = int(os.environ.get("REDSHIFT_PORT", "5439"))
 
 # Cache for credentials
@@ -73,7 +72,7 @@ def get_redshift_credentials() -> dict:
     Get Redshift credentials from AWS Secrets Manager.
 
     Returns:
-        dict: {host, account, pwd}
+        dict: {host, user, password, database}
     """
     global _cached_credentials
 
@@ -89,6 +88,7 @@ def get_redshift_credentials() -> dict:
             "host": secret.get("host", ""),
             "user": secret.get("account", ""),
             "password": secret.get("pwd", ""),
+            "database": secret.get("database", "dev"),
         }
         logger.info("Successfully retrieved Redshift credentials from Secrets Manager")
         return _cached_credentials
@@ -147,7 +147,7 @@ def execute_query(sql: str) -> dict[str, Any]:
 
     conn = redshift_connector.connect(
         host=credentials["host"],
-        database=REDSHIFT_DATABASE,
+        database=credentials["database"],
         port=REDSHIFT_PORT,
         user=credentials["user"],
         password=credentials["password"],
