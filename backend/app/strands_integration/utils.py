@@ -30,6 +30,10 @@ def get_strands_registered_tools(bot: BotModel | None = None) -> list[StrandsAge
         create_jenkins_runner_tool,
         create_lambda_runner_tool,
     )
+    from app.strands_integration.tools.redshift_query import (
+        create_redshift_query_tool,
+        create_redshift_schema_tool,
+    )
     from app.strands_integration.tools.simple_list import simple_list, structured_list
 
     tools: list[StrandsAgentTool] = []
@@ -38,6 +42,8 @@ def get_strands_registered_tools(bot: BotModel | None = None) -> list[StrandsAge
     tools.append(create_agentcore_tool(bot))
     tools.append(create_jenkins_runner_tool(bot))
     tools.append(create_lambda_runner_tool(bot))
+    tools.append(create_redshift_query_tool(bot))
+    tools.append(create_redshift_schema_tool(bot))
     # tools.append(create_calculator_tool(bot))  # For testing purposes
     return tools
 

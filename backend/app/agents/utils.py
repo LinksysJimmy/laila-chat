@@ -8,6 +8,7 @@ from app.agents.tools.calculator import calculator_tool
 from app.agents.tools.internet_search import internet_search_tool
 from app.agents.tools.knowledge import create_knowledge_tool
 from app.agents.tools.lambda_runner import jenkins_runner_tool, lambda_runner_tool
+from app.agents.tools.redshift_query import redshift_query_tool, redshift_schema_tool
 from app.agents.tools.simple_list import simple_list_tool
 from app.bedrock import is_tooluse_supported
 from app.repositories.models.custom_bot import BotModel
@@ -24,6 +25,8 @@ def get_available_tools() -> list[AgentTool]:
     tools.append(bedrock_agent_tool)
     tools.append(jenkins_runner_tool)
     tools.append(lambda_runner_tool)
+    tools.append(redshift_query_tool)
+    tools.append(redshift_schema_tool)
     return tools
 
 
