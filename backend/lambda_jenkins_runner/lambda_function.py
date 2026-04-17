@@ -75,6 +75,7 @@ JOB_MAPPING = {
     ("deploy", "cloud2"): "deploy-cloud2",
     ("stop", "tomcat"): "stop-tomcat",
     ("start", "tomcat"): "start-tomcat",
+    ("build", "pinnacle"): "build-Pinnacle",
     # Add more mappings as needed
 }
 

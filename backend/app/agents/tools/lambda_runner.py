@@ -26,14 +26,14 @@ LAMBDA_RUNNER_REGION = os.environ.get("LAMBDA_RUNNER_REGION", "us-east-1")
 class JenkinsRunnerInput(BaseModel):
     """Input schema for Jenkins runner tool"""
 
-    action: Literal["restart", "deploy", "stop", "start", "status"] = Field(
+    action: Literal["restart", "deploy", "stop", "start", "status", "build"] = Field(
         description="The action to perform on the target"
     )
     environment: Literal["QA", "staging", "production", "dev"] = Field(
         description="The environment name (QA, staging, production, dev)"
     )
     target: str = Field(
-        description="The target system or service name (e.g., cloud1, cloud2, tomcat, api-server, web-app)"
+        description="The target system or service name (e.g., cloud1, cloud2, tomcat, Pinnacle, api-server, web-app)"
     )
 
 
@@ -195,8 +195,8 @@ jenkins_runner_tool = AgentTool(
     name="jenkins_runner",
     description=(
         "Execute Jenkins jobs to manage cloud environments and infrastructure. "
-        "Use this tool when user wants to restart, deploy, stop, start, or check status of cloud services. "
-        "Examples: 'restart QA cloud1', 'restart QA tomcat', 'deploy to staging', 'check status of production api-server'"
+        "Use this tool when user wants to restart, deploy, stop, start, build, or check status of cloud services. "
+        "Examples: 'restart QA cloud1', 'restart QA tomcat', 'build Pinnacle', 'deploy to staging', 'check status of production api-server'"
     ),
     args_schema=JenkinsRunnerInput,
     function=_jenkins_runner_function,

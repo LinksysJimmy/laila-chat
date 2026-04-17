@@ -99,18 +99,18 @@ def create_jenkins_runner_tool(bot: BotModel | None = None):
 
     @tool
     def jenkins_runner(
-        action: Literal["restart", "deploy", "stop", "start", "status"],
+        action: Literal["restart", "deploy", "stop", "start", "status", "build"],
         environment: Literal["QA", "staging", "production", "dev"],
         target: str,
     ) -> str:
         """
         Execute Jenkins jobs to manage cloud environments and infrastructure.
-        Use this tool when user wants to restart, deploy, stop, start, or check status of cloud services.
+        Use this tool when user wants to restart, deploy, stop, start, build, or check status of cloud services.
 
         Args:
-            action: The action to perform (restart, deploy, stop, start, status)
+            action: The action to perform (restart, deploy, stop, start, status, build)
             environment: The environment name (QA, staging, production, dev)
-            target: The target system or service name (e.g., cloud1, cloud2, tomcat, api-server, web-app)
+            target: The target system or service name (e.g., cloud1, cloud2, tomcat, Pinnacle, api-server, web-app)
 
         Returns:
             str: Result of the Jenkins job execution
