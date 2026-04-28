@@ -4,6 +4,9 @@ import { getGitHubToken } from '../utils/githubToken';
 
 const WS_ENDPOINT: string = import.meta.env.VITE_APP_WS_ENDPOINT;
 const CHUNK_SIZE = 32 * 1024; // 32KB
+// Matches the AgentCore Lambda timeout ceiling; prevents hung UIs if the
+// backend dies silently or the WebSocket stays open without a response.
+const AGENTCORE_TIMEOUT_MS = 5 * 60 * 1000;
 
 // Get token from Amplify or GitHub OAuth
 const getAuthToken = async (): Promise<string | undefined> => {
@@ -23,6 +26,8 @@ export interface AgentCoreWsResponse {
   response: string;
   session_id: string;
 }
+
+export type AgentCoreError = Error & { sessionId?: string };
 
 const sendAgentCoreMessage = (
   message: string,
@@ -54,6 +59,37 @@ const sendAgentCoreMessage = (
 
     let receivedCount = 0;
     const ws = new WebSocket(WS_ENDPOINT);
+
+    const timeoutHandle = setTimeout(() => {
+      if (responseReceived) {
+        return;
+      }
+      responseReceived = true;
+      try {
+        ws.close();
+      } catch {
+        /* already closed */
+      }
+      reject(new Error('AgentCore request timed out after 5 minutes'));
+    }, AGENTCORE_TIMEOUT_MS);
+
+    const resolveOnce = (value: AgentCoreWsResponse) => {
+      responseReceived = true;
+      clearTimeout(timeoutHandle);
+      ws.close();
+      resolve(value);
+    };
+
+    const rejectOnce = (err: AgentCoreError) => {
+      responseReceived = true;
+      clearTimeout(timeoutHandle);
+      try {
+        ws.close();
+      } catch {
+        /* already closed */
+      }
+      reject(err);
+    };
 
     ws.onopen = () => {
       ws.send(
@@ -103,32 +139,30 @@ const sendAgentCoreMessage = (
         const data = JSON.parse(event.data);
 
         if (data.status === PostStreamingStatus.AGENTCORE_RESPONSE) {
-          responseReceived = true;
-          ws.close();
-          resolve({
+          resolveOnce({
             response: data.response,
             session_id: data.session_id,
           });
         } else if (data.status === PostStreamingStatus.ERROR) {
-          responseReceived = true;
-          ws.close();
-          reject(new Error(data.reason || 'Agent error'));
+          const err: AgentCoreError = new Error(data.reason || 'Agent error');
+          // Attach correlation ID so the caller can log it.
+          err.sessionId = data.session_id;
+          rejectOnce(err);
         }
       } catch (e) {
-        responseReceived = true;
-        ws.close();
-        reject(e instanceof Error ? e : new Error('Failed to parse response'));
+        rejectOnce(
+          e instanceof Error ? e : new Error('Failed to parse response')
+        );
       }
     };
 
     ws.onerror = () => {
-      responseReceived = true;
-      ws.close();
-      reject(new Error('WebSocket connection failed'));
+      rejectOnce(new Error('WebSocket connection failed'));
     };
 
     ws.onclose = () => {
       if (!responseReceived) {
+        clearTimeout(timeoutHandle);
         reject(new Error('Connection lost while waiting for agent response'));
       }
     };

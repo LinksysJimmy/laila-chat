@@ -12,6 +12,10 @@ from typing import BinaryIO, Literal, TypedDict
 import boto3
 from app.agents.tools.agent_tool import ToolRunResult
 from app.auth import verify_token
+from app.integrations.agentcore import (
+    build_agentcore_envelope,
+    get_agentcore_client,
+)
 from app.repositories.conversation import RecordNotFoundError
 from app.routes.schemas.conversation import ChatInput
 from app.stream import OnStopInput, OnThinking
@@ -40,9 +44,7 @@ _agentcore_client = None
 def _get_agentcore_client():
     global _agentcore_client
     if _agentcore_client is None:
-        _agentcore_client = boto3.client(
-            "bedrock-agentcore", region_name=AGENTCORE_REGION
-        )
+        _agentcore_client = get_agentcore_client()
     return _agentcore_client
 
 dynamodb_client = boto3.resource("dynamodb")
@@ -279,19 +281,23 @@ def process_chat_input(
 
 
 def process_agentcore_request(
-    user_id: str,
+    user: User,
     request: AgentCoreWsRequest,
     notificator: NotificationSender,
 ) -> dict:
     """Invoke AgentCore and send the response back over WebSocket."""
-    session_id = request.session_id or f"{uuid.uuid4()}-{user_id[:8]}"
+    session_id = request.session_id or f"{uuid.uuid4()}-{user.id[:8]}"
 
     try:
         client = _get_agentcore_client()
+        envelope = build_agentcore_envelope(
+            user=user,
+            message=request.message,
+        )
         response = client.invoke_agent_runtime(
             agentRuntimeArn=AGENT_RUNTIME_ARN,
             runtimeSessionId=session_id,
-            payload=json.dumps({"prompt": request.message}).encode("utf-8"),
+            payload=json.dumps(envelope).encode("utf-8"),
             contentType="application/json",
         )
 
@@ -311,30 +317,34 @@ def process_agentcore_request(
 
     except ClientError as e:
         error_code = e.response["Error"]["Code"]
+        if error_code in ("ThrottlingException", "ServiceQuotaExceededException"):
+            internal_reason = "Agent is busy, try again later."
+        elif error_code == "AccessDeniedException":
+            internal_reason = "Not authorized to invoke agent."
+        else:
+            internal_reason = f"Agent runtime error: {error_code}"
+
         logger.error(
             "AgentCore invocation failed",
             extra={
-                "user_id": user_id,
+                "user_id": user.id,
                 "session_id": session_id,
                 "error_code": error_code,
+                "internal_reason": internal_reason,
             },
         )
-        if error_code in ("ThrottlingException", "ServiceQuotaExceededException"):
-            reason = "Agent is busy, try again later."
-        elif error_code == "AccessDeniedException":
-            reason = "Not authorized to invoke agent."
-        else:
-            reason = f"Agent runtime error: {error_code}"
 
         notificator.notify(
             json.dumps(
                 {
                     "status": "ERROR",
-                    "reason": reason,
+                    "reason": "Something went wrong — please try again.",
+                    "session_id": session_id,
+                    "error_code": error_code,
                 }
             ).encode("utf-8")
         )
-        return {"statusCode": 500, "body": reason}
+        return {"statusCode": 500, "body": "agent_error"}
 
 
 def handler(event, context):
@@ -451,7 +461,7 @@ def handler(event, context):
 
             if parsed_message.get("action") == "agentcore":
                 return process_agentcore_request(
-                    user_id=user_id,
+                    user=user,
                     request=AgentCoreWsRequest(**parsed_message),
                     notificator=notificator,
                 )
@@ -487,7 +497,7 @@ def handler(event, context):
             "body": json.dumps(
                 {
                     "status": "ERROR",
-                    "reason": str(e),
+                    "reason": "Something went wrong — please try again.",
                 }
             ),
         }

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import sendAgentCoreMessage from './useAgentCoreWebSocket';
+import sendAgentCoreMessage, { AgentCoreError } from './useAgentCoreWebSocket';
 
 export interface AgentCoreMessage {
   role: 'user' | 'assistant';
@@ -37,9 +37,13 @@ const useAgentCoreChat = () => {
         };
         setMessages((prev) => [...prev, assistantMessage]);
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Failed to get response';
-        setError(errorMessage);
+        const sessionId = (err as AgentCoreError | undefined)?.sessionId;
+        if (sessionId && import.meta.env.DEV) {
+          // Dev-only: help local debugging correlate with CloudWatch.
+          // eslint-disable-next-line no-console
+          console.error('AgentCore error', { sessionId });
+        }
+        setError('Something went wrong — please try again.');
       } finally {
         setIsLoading(false);
       }

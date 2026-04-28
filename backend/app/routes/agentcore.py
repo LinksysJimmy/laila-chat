@@ -3,10 +3,13 @@ import logging
 import os
 import uuid
 
-import boto3
 from botocore.exceptions import ClientError
 from fastapi import APIRouter, HTTPException, Request
 
+from app.integrations.agentcore import (
+    build_agentcore_envelope,
+    get_agentcore_client,
+)
 from app.routes.schemas.agentcore import (
     AgentCoreInvokeRequest,
     AgentCoreInvokeResponse,
@@ -27,9 +30,7 @@ _agentcore_client = None
 def _get_agentcore_client():
     global _agentcore_client
     if _agentcore_client is None:
-        _agentcore_client = boto3.client(
-            "bedrock-agentcore", region_name=AGENTCORE_REGION
-        )
+        _agentcore_client = get_agentcore_client()
     return _agentcore_client
 
 
@@ -40,7 +41,8 @@ def invoke_agentcore(request: Request, body: AgentCoreInvokeRequest):
 
     session_id = body.session_id or f"{uuid.uuid4()}-{user.id[:8]}"
 
-    payload = json.dumps({"prompt": body.message}).encode("utf-8")
+    envelope = build_agentcore_envelope(user=user, message=body.message)
+    payload = json.dumps(envelope).encode("utf-8")
 
     try:
         client = _get_agentcore_client()
